@@ -44,6 +44,7 @@ export const tagsModel = model("tags", TagsSchema);
 
 const BrainLink = new Schema({
     hash: { type: String, required: true, unique: true },
+    share: { type: Boolean, required: true },
     userId: { type: Types.ObjectId, ref: "users", required: true },
 });
 
