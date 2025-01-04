@@ -28,14 +28,13 @@ contentRouter.post("/", userAuthMiddleware, async (req, res) => {
 
         // Using a for...of loop to handle asynchronous operations properly
         for (const title of tags) {
-            const existingTag = await tagsModel.findOne({ title });
+            const newOrExistingTag = await tagsModel.findOneAndUpdate(
+                { title },
+                { title },
+                { upsert: true, new: true }
+            );
 
-            if (existingTag) {
-                associatedTagIds.push(existingTag._id);
-            } else {
-                const newTag = await tagsModel.create({ title });
-                associatedTagIds.push(newTag._id);
-            }
+            associatedTagIds.push(newOrExistingTag._id);
         }
 
         await contentModel.create({
