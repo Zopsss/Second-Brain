@@ -10,19 +10,15 @@ export const userAuthMiddleware = (
     const token = req.headers.authorization as string;
 
     try {
-        console.log("before decoded");
         const decoded = jwt.verify(
             token,
             process.env.JWT_SECRET as string
         ) as CustomJwtPayload;
 
-        console.log("after decoded");
         if (decoded) {
-            console.log("inside if");
             req.userId = decoded.userId;
             next();
         } else {
-            console.log("inside else");
             res.status(403).json({
                 msg: "Forbidden! Something is wrong with the JWT Token.",
             });

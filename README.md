@@ -1,5 +1,7 @@
 ### Setup
 
+***Clone or download zip of the repo.***
+
 ```
 cd backend
 npm install
