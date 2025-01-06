@@ -74,6 +74,61 @@ contentRouter.get("/", userAuthMiddleware, async (req, res) => {
     }
 });
 
+// searching content based on title or tags
+contentRouter.get("/search", userAuthMiddleware, async (req, res) => {
+    const userId = req.userId as string;
+    const { title, tags } = req.query;
+
+    if (!title && (!tags || !Array.isArray(tags) || tags.length === 0)) {
+        res.status(400).json({
+            msg: "At least one of 'title' or 'tags' must be provided. ",
+        });
+        return;
+    }
+
+    interface Query {
+        userId: string;
+        title?: RegExp;
+        tags?: Types.ObjectId[];
+    }
+
+    try {
+        const query: Query = { userId };
+
+        if (title) {
+            query.title = new RegExp(title as string, "i");
+        }
+
+        if (tags) {
+            const neko = (tags as string).split(",");
+            const fetchedTags = await tagsModel.find(
+                { title: { $in: neko } },
+                { id: 1 }
+            );
+            console.log(fetchedTags);
+
+            if (fetchedTags) {
+                const fetchedTagsReferenceIds = fetchedTags.map(
+                    (tag) => tag.id
+                );
+                console.log(fetchedTagsReferenceIds);
+                query.tags = fetchedTagsReferenceIds;
+            }
+        }
+
+        const fetchedContent = await contentModel.find(query);
+
+        if (fetchedContent.length > 0) {
+            res.status(200).json({ fetchedContent });
+        } else {
+            res.status(404).json({ msg: "No content found" });
+        }
+    } catch (error) {
+        console.log(error);
+        res.status(500).json({ msg: "Failed to fetch search content." });
+    }
+});
+
 // updating content
 contentRouter.put("/", userAuthMiddleware, async (req, res) => {
     const userId = req.userId;
