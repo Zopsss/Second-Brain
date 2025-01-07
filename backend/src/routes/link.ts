@@ -8,6 +8,7 @@ export const linkRouter = Router();
 // creating link and updating it's share-able status.
 // May need to change this approach in future,
 // might have to make different enpoints for creating link and updating link.
+// TODO: ensure there's only one brain-link per user.
 linkRouter.post("/share", userAuthMiddleware, async (req, res) => {
     const userId = req.userId;
     const share: boolean = req.body.share;
@@ -57,6 +58,41 @@ linkRouter.post("/share", userAuthMiddleware, async (req, res) => {
         });
     }
 });
+
+// in frontend, ensure that this endpoint is only accessible
+// if user has generated his brain-link.
+linkRouter.put(
+    "/share/regenerate-link",
+    userAuthMiddleware,
+    async (req, res) => {
+        const userId = req.userId;
+
+        try {
+            const newHash = uuidv4();
+            const newBrainLink = await brainLinkModel.findOneAndUpdate(
+                { userId },
+                { hash: newHash },
+                { new: true }
+            );
+
+            // we don't really need this if/else as we're ensuring that this endpoint
+            // is only accessible when user has generted brain-link in frontend,
+            // i.e a brain-link already exists for current user.
+            // But I'm still adding this just in-case if someone locally tries
+            // to hit this endpoint from postman or from somewhere else.
+            if (newBrainLink) {
+                res.status(200).json({ newBrainLink });
+            } else {
+                res.status(404).json({
+                    msg: "no brain-link found with the current user.",
+                });
+            }
+        } catch (error) {
+            console.log(error);
+            res.status(500).json({ msg: "Failed to regenerate brain link." });
+        }
+    }
+);
 
 // getting content with share-able link.
 linkRouter.get("/:shareLink", async (req, res) => {
