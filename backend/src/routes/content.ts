@@ -74,54 +74,74 @@ contentRouter.get("/", userAuthMiddleware, async (req, res) => {
     }
 });
 
-// searching content based on title or tags
+// searching content based on provided title or tags
 contentRouter.get("/search", userAuthMiddleware, async (req, res) => {
     const userId = req.userId as string;
     const { title, tags } = req.query;
 
-    if (!title && (!tags || !Array.isArray(tags) || tags.length === 0)) {
+    console.log("title: ", title, "tags: ", tags);
+    console.log(typeof tags);
+
+    if (!title && (!tags || tags instanceof String)) {
         res.status(400).json({
             msg: "At least one of 'title' or 'tags' must be provided. ",
         });
         return;
     }
 
-    interface Query {
-        userId: string;
+    interface OrConditions {
         title?: RegExp;
-        tags?: Types.ObjectId[];
+        tags?: { $in: Types.ObjectId[] };
     }
 
     try {
-        const query: Query = { userId };
+        const orConditions: OrConditions[] = [];
 
         if (title) {
-            query.title = new RegExp(title as string, "i");
+            orConditions.push({ title: new RegExp(title as string, "i") });
         }
 
         if (tags) {
-            const neko = (tags as string).split(",");
+            // retrieving tags' id only, but it is fetched in array -> object format, like this:
+            // [{ _id: "id of first tag" }, { _id: "id of second tag" }, ...]
             const fetchedTags = await tagsModel.find(
-                { title: { $in: neko } },
+                { title: { $in: (tags as string).split(",") } },
                 { id: 1 }
             );
             console.log(fetchedTags);
 
-            if (fetchedTags) {
+            if (fetchedTags.length > 0) {
+                // extracting "_id" from the array of objects, new array will be like this:
+                // [ "id of first tag", "id of second tag", ...]
                 const fetchedTagsReferenceIds = fetchedTags.map(
-                    (tag) => tag.id
+                    (tag) => tag._id
                 );
                 console.log(fetchedTagsReferenceIds);
-                query.tags = fetchedTagsReferenceIds;
+                orConditions.push({ tags: { $in: fetchedTagsReferenceIds } });
             }
         }
 
-        const fetchedContent = await contentModel.find(query);
+        // "> 0" condition is needed because if there's no tag(s) in db
+        // similar to the provided tag(s) and the title is also not provided
+        // then orConditions's length will be 0, in this case we don't need
+        // to query DB as it will not find any content.
+        if (orConditions.length > 0) {
+            const fetchedContent = await contentModel
+                .find({
+                    userId,
+                    $or: orConditions,
+                })
+                .populate({ path: "tags", select: "title" });
 
-        if (fetchedContent.length > 0) {
-            res.status(200).json({ fetchedContent });
+            if (fetchedContent.length > 0) {
+                res.status(200).json({ fetchedContent });
+            } else {
+                res.status(404).json({ msg: "No content found." });
+            }
         } else {
-            res.status(404).json({ msg: "No content found" });
+            res.status(404).json({
+                msg: "No content found.",
+            });
         }
     } catch (error) {
         console.log(error);
