@@ -12,27 +12,30 @@ export const userModel = model("users", UserSchema);
 //     password: string;
 // }
 
-const ContentSchema = new Schema({
-    link: { type: String, required: true },
-    type: {
-        type: String,
-        enum: ["YouTube", "Notion", "X", "Instagram", "Others"],
-        required: true,
+const ContentSchema = new Schema(
+    {
+        link: { type: String, required: true },
+        type: {
+            type: String,
+            enum: ["YouTube", "Notion", "X", "Instagram", "Others"],
+            required: true,
+        },
+        title: { type: String, required: true },
+        tags: [{ type: Types.ObjectId, ref: "tags" }],
+        userId: {
+            type: Types.ObjectId,
+            ref: "users",
+            required: true,
+            // validate: async (value: User) => {
+            //     const user = await userModel.findById(value);
+            //     if (!user) {
+            //         throw new Error("User does not exists for this Content.");
+            //     }
+            // },
+        },
     },
-    title: { type: String, required: true },
-    tags: [{ type: Types.ObjectId, ref: "tags" }],
-    userId: {
-        type: Types.ObjectId,
-        ref: "users",
-        required: true,
-        // validate: async (value: User) => {
-        //     const user = await userModel.findById(value);
-        //     if (!user) {
-        //         throw new Error("User does not exists for this Content.");
-        //     }
-        // },
-    },
-});
+    { timestamps: true }
+);
 
 export const contentModel = model("content", ContentSchema);
 

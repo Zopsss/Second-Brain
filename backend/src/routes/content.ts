@@ -37,7 +37,7 @@ contentRouter.post("/", userAuthMiddleware, async (req, res) => {
             associatedTagIds.push(newOrExistingTag._id);
         }
 
-        await contentModel.create({
+        const createdContent = await contentModel.create({
             link,
             title,
             tags: associatedTagIds,
@@ -45,9 +45,7 @@ contentRouter.post("/", userAuthMiddleware, async (req, res) => {
             userId,
         });
 
-        res.status(200).json({
-            msg: "Content added.",
-        });
+        res.status(200).json({ createdContent });
     } catch (error) {
         console.log(error);
         res.status(500).json({
