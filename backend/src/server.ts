@@ -7,6 +7,14 @@ import { linkRouter } from "./routes/link";
 const app = express();
 app.use(json());
 
+declare global {
+    namespace Express {
+        export interface Request {
+            userId?: string;
+        }
+    }
+}
+
 app.use("/", authRouter);
 app.use("/api/v1/content", contentRouter);
 app.use("/api/v1/brain", linkRouter);

@@ -63,8 +63,6 @@ contentRouter.get("/", userAuthMiddleware, async (req, res) => {
             .find({ userId })
             .populate({ path: "tags", select: "title" });
 
-        console.log(response);
-
         res.status(200).json({ response });
     } catch (error) {
         console.log(error);
@@ -76,9 +74,6 @@ contentRouter.get("/", userAuthMiddleware, async (req, res) => {
 contentRouter.get("/search", userAuthMiddleware, async (req, res) => {
     const userId = req.userId as string;
     const { title, tags } = req.query;
-
-    console.log("title: ", title, "tags: ", tags);
-    console.log(typeof tags);
 
     if (!title && (!tags || tags instanceof String)) {
         res.status(400).json({
@@ -106,7 +101,6 @@ contentRouter.get("/search", userAuthMiddleware, async (req, res) => {
                 { title: { $in: (tags as string).split(",") } },
                 { id: 1 }
             );
-            console.log(fetchedTags);
 
             if (fetchedTags.length > 0) {
                 // extracting "_id" from the array of objects, new array will be like this:
@@ -114,7 +108,6 @@ contentRouter.get("/search", userAuthMiddleware, async (req, res) => {
                 const fetchedTagsReferenceIds = fetchedTags.map(
                     (tag) => tag._id
                 );
-                console.log(fetchedTagsReferenceIds);
                 orConditions.push({ tags: { $in: fetchedTagsReferenceIds } });
             }
         }

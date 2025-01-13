@@ -1,6 +1,6 @@
 import jwt from "jsonwebtoken";
 import { NextFunction, Request, Response } from "express";
-import { CustomJwtPayload } from "../utils";
+import { CustomJwtPayload } from "../utils/CustomJwtPayload";
 
 export const userAuthMiddleware = (
     req: Request,

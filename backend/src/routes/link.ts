@@ -2,14 +2,45 @@ import { v4 as uuidv4 } from "uuid";
 import { Router } from "express";
 import { brainLinkModel, contentModel } from "../db";
 import { userAuthMiddleware } from "../middlewares";
+import { MongoServerError } from "mongodb";
 
 export const linkRouter = Router();
 
-// creating link and updating it's share-able status.
-// May need to change this approach in future,
-// might have to make different enpoints for creating link and updating link.
-// TODO: ensure there's only one brain-link per user.
-linkRouter.post("/share", userAuthMiddleware, async (req, res) => {
+linkRouter.post("/create-link", async (req, res) => {
+    const userId = req.userId;
+    const share: boolean = req.body.share;
+
+    if (share === undefined || share === null) {
+        res.status(411).json({
+            msg: "no choices for share-able link provided.",
+        });
+        return;
+    }
+
+    try {
+        const hash = uuidv4();
+        const createdLink = await brainLinkModel.create({
+            hash,
+            share,
+            userId,
+        });
+
+        res.status(200).json({ createdLink });
+    } catch (error) {
+        console.log(error);
+        if (error instanceof MongoServerError && error.code === 11000) {
+            res.status(403).json({
+                msg: "brain-link for this user already exists.",
+            });
+        } else {
+            res.status(500).json({
+                msg: "Internal Server Error while generating brain-link.",
+            });
+        }
+    }
+});
+
+linkRouter.put("/share", userAuthMiddleware, async (req, res) => {
     const userId = req.userId;
     const share: boolean = req.body.share;
 
@@ -21,37 +52,28 @@ linkRouter.post("/share", userAuthMiddleware, async (req, res) => {
     }
 
     try {
-        const shareableLink = await brainLinkModel.findOne({ userId });
+        const updatedLink = await brainLinkModel.findOneAndUpdate(
+            { userId },
+            { $set: { share } },
+            { new: true }
+        );
 
-        if (shareableLink) {
-            if (shareableLink.share === share) {
-                res.status(200).json({ msg: "No need to update link status" });
-                return;
-            }
-
-            const updatedLink = await brainLinkModel.findOneAndUpdate(
-                { _id: shareableLink.id },
-                { $set: { share } },
-                { new: true }
-            );
-
-            res.status(200).json({
-                msg: "Link share status updated.",
-                link: updatedLink,
+        if (!updatedLink) {
+            res.status(411).json({
+                msg: "brain-link for this user doesn't exist.",
             });
-        } else {
-            const hash = uuidv4();
-            const createdLink = await brainLinkModel.create({
-                hash,
-                share,
-                userId,
-            });
-
-            res.status(200).json({
-                msg: `new link created with share-able status as: ${share}`,
-                link: createdLink,
-            });
+            return;
         }
+
+        if (updatedLink.share === share) {
+            res.status(200).json({ msg: "No need to update link status" });
+            return;
+        }
+
+        res.status(200).json({
+            msg: "Link share status updated.",
+            link: updatedLink,
+        });
     } catch (error) {
         res.status(500).json({
             msg: "Failed to update share-able link.",
@@ -94,6 +116,26 @@ linkRouter.put(
     }
 );
 
+linkRouter.get("/", userAuthMiddleware, async (req, res) => {
+    const userId = req.userId;
+
+    try {
+        const brainLink = await brainLinkModel.findOne({ userId });
+
+        if (brainLink) {
+            res.status(200).json({ link: brainLink.hash });
+            return;
+        }
+
+        res.status(404).json({ msg: "Link not found for current user." });
+    } catch (error) {
+        console.log(error);
+        res.status(500).json({
+            msg: "Failed to get brain-link for current user.",
+        });
+    }
+});
+
 // getting content with share-able link.
 linkRouter.get("/:shareLink", async (req, res) => {
     const shareLink: string = req.params.shareLink;
@@ -106,21 +148,25 @@ linkRouter.get("/:shareLink", async (req, res) => {
                 .find({
                     userId: brainLink.userId,
                 })
-                .populate({ path: "tags", select: "title" });
+                .populate({ path: "tags", select: "title" })
+                .lean();
 
             if (brainContent) {
                 res.status(200).json({ brainContent });
-            } else {
-                res.status(404).json({
-                    msg: "No content found with provided link. User might have no content stored.",
-                });
+                return;
             }
-        } else {
+
             res.status(404).json({
-                msg: "No content found with provided link.",
+                msg: "No content found with provided link. User might have no content stored.",
             });
+            return;
         }
+
+        res.status(404).json({
+            msg: "No content found with provided link.",
+        });
     } catch (error) {
+        console.log(error);
         res.status(500).json({
             msg: "Failed to fetch content with provided link.",
         });

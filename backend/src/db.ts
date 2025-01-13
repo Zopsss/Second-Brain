@@ -7,10 +7,10 @@ const UserSchema = new Schema({
 
 export const userModel = model("users", UserSchema);
 
-// interface User {
-//     username: string;
-//     password: string;
-// }
+interface User {
+    username: string;
+    password: string;
+}
 
 const ContentSchema = new Schema(
     {
@@ -26,12 +26,12 @@ const ContentSchema = new Schema(
             type: Types.ObjectId,
             ref: "users",
             required: true,
-            // validate: async (value: User) => {
-            //     const user = await userModel.findById(value);
-            //     if (!user) {
-            //         throw new Error("User does not exists for this Content.");
-            //     }
-            // },
+            validate: async (value: User) => {
+                const user = await userModel.findById(value);
+                if (!user) {
+                    throw new Error("User does not exists for this Content.");
+                }
+            },
         },
     },
     { timestamps: true }
@@ -48,7 +48,19 @@ export const tagsModel = model("tags", TagsSchema);
 const BrainLink = new Schema({
     hash: { type: String, required: true, unique: true },
     share: { type: Boolean, required: true },
-    userId: { type: Types.ObjectId, ref: "users", required: true },
+    userId: {
+        type: Types.ObjectId,
+        ref: "users",
+        required: true,
+        unique: true,
+        validate: async (value: User) => {
+            const user = await userModel.findOne({ value });
+            if (!user) {
+                throw new Error("User for this brain-link doesn't exist.");
+            }
+        },
+    },
+    // userId: { unique: true } ensures that there's only one brain-link per user.
 });
 
 export const brainLinkModel = model("brain-links", BrainLink);
