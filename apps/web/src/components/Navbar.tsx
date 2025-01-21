@@ -1,4 +1,4 @@
-import Button from "./Button";
+import Button from "./ui/Button";
 
 const Navbar = () => {
     return (
@@ -7,8 +7,8 @@ const Navbar = () => {
                 <h1 className="text-lg font-bold font-mono">Second Brain</h1>
             </div>
             <div className="flex gap-2">
-                <Button type={"Secondary"} title={"Login"} />
-                <Button type={"Primary"} title={"Sign Up"} />
+                <Button variant="Secondary" title="Login" />
+                <Button variant="Primary" title="Sign Up" />
             </div>
         </nav>
     );
