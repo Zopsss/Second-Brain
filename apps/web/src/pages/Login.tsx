@@ -1,3 +1,4 @@
+import { Lock, Mail } from "../components/icons";
 import Button from "../components/ui/Button";
 import Input from "../components/ui/Input";
 
@@ -28,12 +29,18 @@ const Login = () => {
                     <Input
                         placeholder="example@gmail.com"
                         type="email"
+                        leftIcon={<Mail />}
                         required
                     />
                 </div>
                 <div>
                     <p className="text-sm font-semibold mb-2">Password</p>
-                    <Input type="password" required />
+                    <Input
+                        type="password"
+                        leftIcon={<Lock />}
+                        placeholder="••••••••"
+                        required
+                    />
                 </div>
                 <Button
                     title="Login"

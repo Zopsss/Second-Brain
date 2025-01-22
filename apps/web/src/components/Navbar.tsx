@@ -2,7 +2,7 @@ import Button from "./ui/Button";
 
 const Navbar = () => {
     return (
-        <nav className="bg-white flex justify-around items-center border-b border-slate-200 p-3 sticky top-0">
+        <nav className="bg-white flex justify-between items-center border-b px-52 py-3 sticky top-0">
             <div>
                 <h1 className="text-lg font-bold font-mono">Second Brain</h1>
             </div>

@@ -1,19 +1,20 @@
-import React from "react";
+import React, { ReactElement } from "react";
 
-const Input: React.FC<React.InputHTMLAttributes<HTMLInputElement>> = ({
-    placeholder,
-    type,
-    ...props
-}) => {
-    const displayPlaceholder = type === "password" ? "••••••••" : placeholder;
+interface InputProps extends React.InputHTMLAttributes<HTMLInputElement> {
+    leftIcon: ReactElement;
+}
 
+const Input: React.FC<InputProps> = ({ className, leftIcon, ...props }) => {
     return (
-        <input
-            type={type}
-            className="border border-slate-400 rounded-md focus:outline-none px-3 py-1 w-96"
-            placeholder={displayPlaceholder}
-            {...props}
-        />
+        <div className="flex flex-1 items-center justify-center relative group">
+            <input
+                className={`border border-slate-300 rounded-md focus:outline-none pt-1 pb-[0.40rem] w-96 focus:border-purple-300 px-8 ${className}`}
+                {...props}
+            />
+            <div className="absolute left-2 text-slate-400 group-has-[:focus]:text-purple-500">
+                {leftIcon}
+            </div>
+        </div>
     );
 };
 

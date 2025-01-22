@@ -1,4 +1,5 @@
 import Navbar from "./components/Navbar";
+import HomePage from "./pages/HomePage";
 import LandingPage from "./pages/LandingPage";
 import Login from "./pages/Login";
 import SignUp from "./pages/SignUp";
@@ -9,7 +10,8 @@ function App() {
             <Navbar />
             {/* <LandingPage /> */}
             {/* <SignUp /> */}
-            <Login />
+            {/* <Login /> */}
+            <HomePage />
         </>
     );
 }

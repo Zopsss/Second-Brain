@@ -1,3 +1,4 @@
+import { Lock, Mail } from "../components/icons";
 import Button from "../components/ui/Button";
 import Input from "../components/ui/Input";
 
@@ -19,25 +20,36 @@ const SignUp = () => {
             </div>
             <form
                 onSubmit={handleSubmit}
-                className="mt-10 flex gap-6 flex-col bg-white min-w-3/12 items-center justify-center px-10 py-7 rounded-md"
+                className="mt-10 flex gap-4 flex-col bg-white min-w-3/12 items-center justify-center px-10 py-7 rounded-md"
             >
                 <div>
                     <p className="text-sm font-semibold mb-2">Email Address</p>
                     <Input
                         placeholder="example@gmail.com"
                         type="email"
+                        leftIcon={<Mail />}
                         required
                     />
                 </div>
                 <div>
                     <p className="text-sm font-semibold mb-2">Password</p>
-                    <Input type="password" required />
+                    <Input
+                        type="password"
+                        placeholder="••••••••"
+                        leftIcon={<Lock />}
+                        required
+                    />
                 </div>
                 <div>
                     <p className="text-sm font-semibold mb-2">
                         Confirm Password
                     </p>
-                    <Input type="password" required />
+                    <Input
+                        type="password"
+                        placeholder="••••••••"
+                        leftIcon={<Lock />}
+                        required
+                    />
                 </div>
                 <Button
                     title="Sign Up"

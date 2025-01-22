@@ -1,8 +1,5 @@
 import Button from "../components/ui/Button";
-import Link from "../components/icons/Link";
-import Search from "../components/icons/Search";
-import Share from "../components/icons/Share";
-import Shield from "../components/icons/Shield";
+import { Link, Search, Share, Shield } from "../components/icons";
 
 const LandingPage = () => {
     return (
