@@ -1,10 +1,14 @@
+import { Link, useNavigate } from "react-router";
 import { Lock, Mail } from "../components/icons";
 import Button from "../components/ui/Button";
 import Input from "../components/ui/Input";
 
 const Login = () => {
+    const navigate = useNavigate();
+
     const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
         e.preventDefault();
+        navigate("/dashboard");
     };
 
     return (
@@ -15,26 +19,32 @@ const Login = () => {
                 </h1>
                 <p className="font-light text-center tracking-wide">
                     Don't have an account?{" "}
-                    <span className="text-purple-500 font-semibold">
+                    <Link
+                        to="/signup"
+                        className="text-purple-500 font-semibold"
+                    >
                         Sign Up
-                    </span>
+                    </Link>
                 </p>
             </div>
             <form
                 onSubmit={handleSubmit}
                 className="mt-10 flex gap-6 flex-col bg-white min-w-3/12 items-center justify-center px-10 py-7 rounded-md"
             >
-                <div>
-                    <p className="text-sm font-semibold mb-2">Email Address</p>
+                <div className="w-full">
+                    <label className="text-sm font-semibold">
+                        Email Address
+                    </label>
                     <Input
                         placeholder="example@gmail.com"
                         type="email"
                         leftIcon={<Mail />}
+                        className="font-light"
                         required
                     />
                 </div>
-                <div>
-                    <p className="text-sm font-semibold mb-2">Password</p>
+                <div className="w-full">
+                    <label className="text-sm font-semibold">Password</label>
                     <Input
                         type="password"
                         leftIcon={<Lock />}

@@ -1,10 +1,13 @@
+import { Link, useNavigate } from "react-router";
 import { Lock, Mail } from "../components/icons";
 import Button from "../components/ui/Button";
 import Input from "../components/ui/Input";
 
 const SignUp = () => {
+    const navigate = useNavigate();
     const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
         e.preventDefault();
+        navigate("/dashboard");
     };
 
     return (
@@ -15,24 +18,29 @@ const SignUp = () => {
                 </h1>
                 <p className="font-light text-center tracking-wide">
                     Already have an account?{" "}
-                    <span className="text-purple-500 font-semibold">Login</span>
+                    <Link to="/login" className="text-purple-500 font-semibold">
+                        Login
+                    </Link>
                 </p>
             </div>
             <form
                 onSubmit={handleSubmit}
                 className="mt-10 flex gap-4 flex-col bg-white min-w-3/12 items-center justify-center px-10 py-7 rounded-md"
             >
-                <div>
-                    <p className="text-sm font-semibold mb-2">Email Address</p>
+                <div className="w-full">
+                    <label className="text-sm font-semibold">
+                        Email Address
+                    </label>
                     <Input
                         placeholder="example@gmail.com"
                         type="email"
                         leftIcon={<Mail />}
+                        className="font-light"
                         required
                     />
                 </div>
-                <div>
-                    <p className="text-sm font-semibold mb-2">Password</p>
+                <div className="w-full">
+                    <label className="text-sm font-semibold">Password</label>
                     <Input
                         type="password"
                         placeholder="••••••••"
@@ -40,10 +48,10 @@ const SignUp = () => {
                         required
                     />
                 </div>
-                <div>
-                    <p className="text-sm font-semibold mb-2">
+                <div className="w-full">
+                    <label className="text-sm font-semibold">
                         Confirm Password
-                    </p>
+                    </label>
                     <Input
                         type="password"
                         placeholder="••••••••"

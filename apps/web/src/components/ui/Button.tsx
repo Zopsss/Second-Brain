@@ -1,6 +1,6 @@
 import { ReactElement } from "react";
 
-interface ButtonType extends React.InputHTMLAttributes<HTMLInputElement> {
+interface ButtonType extends React.InputHTMLAttributes<HTMLButtonElement> {
     title: string;
     variant: "Primary" | "Secondary" | "Outline";
     leftIcon?: ReactElement;
@@ -14,7 +14,7 @@ const buttonTypes: Record<ButtonType["variant"], string> = {
     Secondary:
         "bg-purple-100/65 text-purple-800 border border-transparent hover:bg-transparent hover:border-purple-400 transition-all duration-300",
     Outline:
-        "border border-purple-100 text-purple-700 hover:bg-purple-100 hover:border-purple-200 transition-all duration-300",
+        "border border-gray-300 text-gray-600 hover:bg-gray-50 hover:border-gray-200 transition-all duration-300",
 };
 
 const Button = ({
@@ -27,7 +27,8 @@ const Button = ({
 }: ButtonType) => {
     return (
         <button
-            className={`flex items-center justify-center gap-2 px-4 py-2 rounded-md text-sm font-semibold ${buttonTypes[variant]} ${className}`}
+            className={`flex items-center justify-center gap-2 p-2 md:px-4 md:py-2
+            rounded-md text-sm text-nowrap font-semibold ${buttonTypes[variant]} ${className}`}
             type={type}
             onClick={onClick}
         >

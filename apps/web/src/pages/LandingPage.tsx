@@ -1,5 +1,6 @@
 import Button from "../components/ui/Button";
 import { Link, Search, Share, Shield } from "../components/icons";
+import { Link as RouterLink } from "react-router";
 
 const LandingPage = () => {
     return (
@@ -15,7 +16,9 @@ const LandingPage = () => {
                         beautiful interface.
                     </p>
                     <div className="flex gap-3 items-center justify-center mt-5">
-                        <Button variant="Primary" title="Get Started" />
+                        <RouterLink to="/dashboard">
+                            <Button variant="Primary" title="Get Started" />
+                        </RouterLink>
                     </div>
                 </div>
             </main>
