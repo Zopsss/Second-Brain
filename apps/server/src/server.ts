@@ -1,11 +1,15 @@
 import express, { json } from "express";
 import mongoose from "mongoose";
+import cors from "cors";
 import "dotenv/config";
 import { authRouter, contentRouter } from "./routes/index";
 import { linkRouter } from "./routes/link";
+import { userAuthMiddleware } from "./middlewares";
+import { userModel } from "./db";
 
 const app = express();
 app.use(json());
+app.use(cors());
 
 declare global {
     namespace Express {
@@ -15,16 +19,16 @@ declare global {
     }
 }
 
-app.use("/", authRouter);
-app.use("/api/v1/content", contentRouter);
-app.use("/api/v1/brain", linkRouter);
+app.use(`${process.env.BACKEND_URL}/auth`, authRouter);
+app.use(`${process.env.BACKEND_URL}/content`, contentRouter);
+app.use(`${process.env.BACKEND_URL}/brain`, linkRouter);
 
 mongoose
     .connect(process.env.MONGO_URL as string)
     .then(() => {
         console.log("Connected to DB.");
-        app.listen(8080, () => {
-            console.log("Server started at PORT 8080");
+        app.listen(process.env.PORT, () => {
+            console.log(`Server started at PORT ${process.env.PORT}`);
         });
     })
     .catch((error) => {

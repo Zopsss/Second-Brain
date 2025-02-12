@@ -3,6 +3,7 @@ import { model, Schema, Types } from "mongoose";
 const UserSchema = new Schema({
     username: { type: String, required: true, unique: true },
     password: { type: String, required: true },
+    hasBrainLink: { type: Boolean, require: true },
 });
 
 export const userModel = model("users", UserSchema);
@@ -46,19 +47,13 @@ const TagsSchema = new Schema({
 export const tagsModel = model("tags", TagsSchema);
 
 const BrainLink = new Schema({
-    hash: { type: String, required: true, unique: true },
+    link: { type: String, required: true, unique: true },
     share: { type: Boolean, required: true },
     userId: {
         type: Types.ObjectId,
         ref: "users",
         required: true,
         unique: true,
-        validate: async (value: User) => {
-            const user = await userModel.findOne({ value });
-            if (!user) {
-                throw new Error("User for this brain-link doesn't exist.");
-            }
-        },
     },
     // userId: { unique: true } ensures that there's only one brain-link per user.
 });

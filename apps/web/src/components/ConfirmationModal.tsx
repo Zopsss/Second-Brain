@@ -1,17 +1,26 @@
 import { Close } from "./icons";
 import Button from "./ui/Button";
 import { useOnClickOutside } from "usehooks-ts";
-import { useEffect, useRef } from "react";
+import { useRef } from "react";
+import { useMutation, useQueryClient } from "@tanstack/react-query";
+import axios from "axios";
+import { ENV_VARS } from "../constants/envs";
+
+interface LinkType {
+    id: string;
+    link: string;
+    title: string;
+}
 
 const ConfirmationModal = ({
-    title,
     link,
+    token,
     setShowConfirmationModal,
     setShowToast,
     setToastMessage,
 }: {
-    title: string;
-    link: string;
+    link: LinkType;
+    token: string | null;
     setShowConfirmationModal: React.Dispatch<React.SetStateAction<boolean>>;
     setShowToast: React.Dispatch<React.SetStateAction<boolean>>;
     setToastMessage: React.Dispatch<
@@ -22,16 +31,28 @@ const ConfirmationModal = ({
 
     useOnClickOutside(modalRef, () => setShowConfirmationModal(false));
 
-    useEffect(() => {
-        // check if user has generated brain link or not
-        // if not then show "generate link" button
-        // if yes then get the link
-        // set isBrainEnabled based on if link is shareable or not
-        // and set the brainLink
-    }, []);
+    const queryClient = useQueryClient();
+
+    const mutation = useMutation({
+        mutationFn: async (data: LinkType) => {
+            return await axios.delete(`${ENV_VARS.BACKEND_URL}/content/`, {
+                data: { contentId: data.id },
+                headers: {
+                    Authorization: token,
+                },
+            });
+        },
+        onSuccess: () =>
+            queryClient.invalidateQueries({ queryKey: ["userData"] }),
+        onError: (error) => {
+            alert("Link not deleted, please try again.");
+            console.log(error);
+        },
+    });
 
     const handleDeleteLink = () => {
-        console.log("object");
+        // console.log("object");
+        mutation.mutate(link);
         setToastMessage({
             id: Date.now(),
             toastMessage: "Link deleted successfully!",
@@ -63,16 +84,18 @@ const ConfirmationModal = ({
                         <div className="mt-4">
                             <div className="flex gap-2 items-center mb-3">
                                 <h1 className="font-bold">Title: </h1>
-                                <h1 className="font-bold text-sm">{title}</h1>
+                                <h1 className="font-bold text-sm">
+                                    {link.title}
+                                </h1>
                             </div>
                             <div className="flex gap-2 items-center">
                                 <h1 className="font-bold">Link: </h1>
                                 <a
                                     className="font-bold text-sm text-purple-600"
-                                    href={link}
+                                    href={link.link}
                                     target="_blank"
                                 >
-                                    {link}
+                                    {link.link}
                                 </a>
                             </div>
                         </div>

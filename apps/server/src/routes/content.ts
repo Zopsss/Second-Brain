@@ -26,21 +26,32 @@ contentRouter.post("/", userAuthMiddleware, async (req, res) => {
     try {
         let associatedTagIds: Types.ObjectId[] = [];
 
-        // Using a for...of loop to handle asynchronous operations properly
-        for (const title of tags) {
-            const newOrExistingTag = await tagsModel.findOneAndUpdate(
-                { title },
-                { title },
-                { upsert: true, new: true }
-            );
+        if (tags && tags.length > 1) {
+            // Using a for...of loop to handle asynchronous operations properly
+            for (const title of tags) {
+                const newOrExistingTag = await tagsModel.findOneAndUpdate(
+                    { title },
+                    { title },
+                    { upsert: true, new: true }
+                );
 
-            associatedTagIds.push(newOrExistingTag._id);
+                associatedTagIds.push(newOrExistingTag._id);
+            }
+
+            const createdContent = await contentModel.create({
+                link,
+                title,
+                tags: associatedTagIds,
+                type,
+                userId,
+            });
+
+            res.status(200).json({ createdContent });
+            return;
         }
-
         const createdContent = await contentModel.create({
             link,
             title,
-            tags: associatedTagIds,
             type,
             userId,
         });
@@ -71,9 +82,9 @@ contentRouter.get("/", userAuthMiddleware, async (req, res) => {
 });
 
 // searching content based on provided title or tags
-contentRouter.get("/search", userAuthMiddleware, async (req, res) => {
+contentRouter.post("/search", userAuthMiddleware, async (req, res) => {
     const userId = req.userId as string;
-    const { title, tags } = req.query;
+    const { title, tags } = req.body;
 
     if (!title && (!tags || tags instanceof String)) {
         res.status(400).json({
@@ -98,7 +109,7 @@ contentRouter.get("/search", userAuthMiddleware, async (req, res) => {
             // retrieving tags' id only, but it is fetched in array -> object format, like this:
             // [{ _id: "id of first tag" }, { _id: "id of second tag" }, ...]
             const fetchedTags = await tagsModel.find(
-                { title: { $in: (tags as string).split(",") } },
+                { title: { $in: tags } },
                 { id: 1 }
             );
 

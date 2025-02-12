@@ -1,8 +1,18 @@
 import Button from "../components/ui/Button";
 import { Link, Search, Share, Shield } from "../components/icons";
-import { Link as RouterLink } from "react-router";
+import { Link as RouterLink, useNavigate } from "react-router";
+import { useEffect } from "react";
 
-const LandingPage = () => {
+const LandingPage = ({ isAuth }: { isAuth: boolean }) => {
+    const navigate = useNavigate();
+
+    useEffect(() => {
+        if (isAuth) {
+            navigate("/dashboard");
+            return;
+        }
+    }, []);
+
     return (
         <>
             <main className="h-screen flex justify-center items-center">

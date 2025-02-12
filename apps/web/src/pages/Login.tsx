@@ -1,14 +1,55 @@
 import { Link, useNavigate } from "react-router";
-import { Lock, Mail } from "../components/icons";
+import { Lock, Username } from "../components/icons";
 import Button from "../components/ui/Button";
 import Input from "../components/ui/Input";
+import { SubmitHandler, useForm } from "react-hook-form";
+import axios from "axios";
+import { ENV_VARS } from "../constants/envs";
 
-const Login = () => {
+const Login = ({ setIsAuth }: { setIsAuth: (arg0: boolean) => void }) => {
     const navigate = useNavigate();
+    const {
+        register,
+        handleSubmit,
+        formState: { errors },
+        setError,
+    } = useForm<{ username: string; password: string }>();
 
-    const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
-        e.preventDefault();
-        navigate("/dashboard");
+    const onSubmit: SubmitHandler<{
+        username: string;
+        password: string;
+    }> = async (data) => {
+        try {
+            const response = await axios.post(
+                `${ENV_VARS.BACKEND_URL}/auth/signin`,
+                data
+            );
+
+            localStorage.setItem("token", response.data.token);
+            setIsAuth(true);
+            navigate("/dashboard");
+        } catch (error) {
+            console.log(error);
+            if (axios.isAxiosError(error)) {
+                if (error.response) {
+                    const { data, status } = error.response;
+                    console.log(data.msg);
+                    switch (status) {
+                        case 403:
+                            setError("root", { message: data.msg });
+                            return;
+                        default:
+                            setError("root", {
+                                message: data.msg,
+                            });
+                            return;
+                    }
+                }
+            }
+            setError("root", {
+                message: "Something went wrong, please try again.",
+            });
+        }
     };
 
     return (
@@ -28,19 +69,16 @@ const Login = () => {
                 </p>
             </div>
             <form
-                onSubmit={handleSubmit}
+                onSubmit={handleSubmit(onSubmit)}
                 className="mt-10 flex gap-6 flex-col bg-white min-w-3/12 items-center justify-center px-10 py-7 rounded-md"
             >
                 <div className="w-full">
-                    <label className="text-sm font-semibold">
-                        Email Address
-                    </label>
+                    <label className="text-sm font-semibold">Username</label>
                     <Input
-                        placeholder="example@gmail.com"
-                        type="email"
-                        leftIcon={<Mail />}
+                        placeholder="username"
+                        leftIcon={<Username />}
                         className="font-light"
-                        required
+                        {...register("username")}
                     />
                 </div>
                 <div className="w-full">
@@ -49,9 +87,14 @@ const Login = () => {
                         type="password"
                         leftIcon={<Lock />}
                         placeholder="••••••••"
-                        required
+                        {...register("password")}
                     />
                 </div>
+                {errors.root && (
+                    <span className="text-red-500 text-sm">
+                        {errors.root.message}
+                    </span>
+                )}
                 <Button
                     title="Login"
                     variant="Primary"

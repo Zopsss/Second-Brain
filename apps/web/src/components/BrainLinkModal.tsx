@@ -3,30 +3,55 @@ import Button from "./ui/Button";
 import { useOnClickOutside } from "usehooks-ts";
 import { useEffect, useRef, useState } from "react";
 import GenerateLinkInput from "./ui/GenerateLinkInput";
+import axios from "axios";
+import { ENV_VARS } from "../constants/envs";
+import { BrainLinkModalType } from "../types";
 
 const BrainLinkModal = ({
-    setShowBrainLinkModal,
+    token,
+    brainLink,
+    setBrainLink,
     setShowToast,
     setToastMessage,
 }: {
-    setShowBrainLinkModal: React.Dispatch<React.SetStateAction<boolean>>;
+    token: string | null;
+    brainLink: BrainLinkModalType;
+    setBrainLink: React.Dispatch<React.SetStateAction<BrainLinkModalType>>;
     setShowToast: React.Dispatch<React.SetStateAction<boolean>>;
     setToastMessage: React.Dispatch<
         React.SetStateAction<{ id: number; toastMessage: string }>
     >;
 }) => {
     const modalRef = useRef(null);
-    const [brainLink, setBrainLink] = useState<string>();
     const [isBrainEnabled, setIsBrainEnabled] = useState(true);
 
-    useOnClickOutside(modalRef, () => setShowBrainLinkModal(false));
+    useOnClickOutside(modalRef, () =>
+        setBrainLink((e) => ({ ...e, show: false }))
+    );
 
-    const generateBrainLink = () => {
-        // generate user's brain link.
-        setBrainLink(
-            // `Cutie Putiee Nekoo Nennuuu ${Math.floor(Math.random() * 10)}`
-            "https://second-brain/share/5c73bbe9-7075-4981-812d-dbe90ed63b8e"
+    useEffect(() => {
+        const updateShareStatus = async () => {
+            const { data } = await axios.put(
+                `${ENV_VARS.BACKEND_URL}/brain/update-share`,
+                { share: isBrainEnabled },
+                { headers: { Authorization: token } }
+            );
+
+            console.log(data);
+        };
+        updateShareStatus();
+    }, [isBrainEnabled]);
+
+    const generateBrainLink = async () => {
+        const { data } = await axios.post(
+            `${ENV_VARS.BACKEND_URL}/brain/`,
+            {},
+            {
+                headers: { Authorization: token },
+            }
         );
+
+        setBrainLink((e) => ({ ...e, link: data.brainLink.link }));
         setToastMessage({
             id: Date.now(),
             toastMessage: "Brain Link Generated.",
@@ -34,16 +59,23 @@ const BrainLinkModal = ({
         setShowToast(true);
     };
 
-    useEffect(() => {
-        // check if user has generated brain link or not
-        // if not then show "generate link" button
-        // if yes then get the link
-        // set isBrainEnabled based on if link is shareable or not
-        // and set the brainLink
-    }, []);
+    const handleRegenerateBrainLink = async () => {
+        const { data } = await axios.put(
+            `${ENV_VARS.BACKEND_URL}/brain/regenerate-link`,
+            {},
+            { headers: { Authorization: token } }
+        );
+
+        console.log(data);
+        setBrainLink((e) => ({ ...e, link: data.newBrainLink.link }));
+        setToastMessage({
+            toastMessage: "Brain Link Regnerated.",
+            id: Date.now(),
+        });
+    };
 
     const MiddleContent = () => {
-        if (brainLink) {
+        if (brainLink.link) {
             return (
                 <>
                     <div className="flex items-center justify-between gap-5 mb-5">
@@ -51,8 +83,7 @@ const BrainLinkModal = ({
                         <button
                             className="cursor-pointer"
                             onClick={() => {
-                                setBrainLink("Neko Nennuu soo cuttieee");
-                                setShowBrainLinkModal(false);
+                                setBrainLink((e) => ({ ...e, show: false }));
                             }}
                         >
                             <Close />
@@ -60,7 +91,7 @@ const BrainLinkModal = ({
                     </div>
                     <div className="flex flex-col gap-3">
                         <div className="flex items-center justify-between">
-                            <p>Enable Brain Link.</p>
+                            <p>Enable Sharing Brain Link.</p>
                             <span className="cursor-pointer transition-all">
                                 <button
                                     onClick={() =>
@@ -83,11 +114,9 @@ const BrainLinkModal = ({
                             </span>
                         </div>
                         <div>
-                            {isBrainEnabled && (
+                            {isBrainEnabled && brainLink.link && (
                                 <GenerateLinkInput
-                                    value={brainLink}
-                                    brainLink={brainLink}
-                                    generateBrainLink={generateBrainLink}
+                                    brainLink={brainLink.link}
                                     setShowToast={setShowToast}
                                     setToastMessage={setToastMessage}
                                     disabled
@@ -97,13 +126,7 @@ const BrainLinkModal = ({
                         <Button
                             variant="Primary"
                             title="Regenerate Link"
-                            onClick={() => {
-                                setToastMessage({
-                                    toastMessage: "Brain Link Regnerated.",
-                                    id: Date.now(),
-                                });
-                                setShowToast(true);
-                            }}
+                            onClick={handleRegenerateBrainLink}
                         />
                     </div>
                 </>
@@ -115,7 +138,9 @@ const BrainLinkModal = ({
                 <div className="flex w-full justify-end">
                     <button
                         className="cursor-pointer"
-                        onClick={() => setShowBrainLinkModal(false)}
+                        onClick={() =>
+                            setBrainLink((e) => ({ ...e, show: false }))
+                        }
                     >
                         <Close />
                     </button>

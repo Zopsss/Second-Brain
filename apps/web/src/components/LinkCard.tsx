@@ -1,14 +1,27 @@
+import { SetStateAction } from "react";
 import { Tag, YouTube } from "./icons";
 import Delete from "./icons/Delete";
 
 const LinkCard = ({
-    setShowConfirmationModal,
+    id,
     link,
     title,
+    tags,
+    setShowConfirmationModal,
+    setLink,
 }: {
+    id: string;
     title: string;
     link: string;
+    tags: [{ _id: string; title: string }];
     setShowConfirmationModal?: React.Dispatch<React.SetStateAction<boolean>>;
+    setLink: React.Dispatch<
+        React.SetStateAction<{
+            id: string;
+            link: string;
+            title: string;
+        }>
+    >;
 }) => {
     return (
         <div className="bg-white p-5 rounded-lg drop-shadow-md hover:drop-shadow-lg transition-all duration-200">
@@ -23,14 +36,17 @@ const LinkCard = ({
                     {setShowConfirmationModal && (
                         <div
                             className="cursor-pointer text-slate-700"
-                            onClick={() => setShowConfirmationModal(true)}
+                            onClick={() => {
+                                setShowConfirmationModal(true);
+                                setLink({ id, title, link });
+                            }}
                         >
                             <Delete />
                         </div>
                     )}
                 </div>
                 <div>
-                    <p className="text-sm text-purple-600 w-fit">
+                    <p className="text-purple-600 w-fit ml-9 mt-1">
                         <a href={link} target="_blank" className="break-all">
                             {link}
                         </a>
@@ -38,26 +54,19 @@ const LinkCard = ({
                 </div>
             </div>
             <div className="mt-4 flex gap-1 flex-wrap">
-                <div className="w-fit flex gap-2 items-center bg-purple-100 text-purple-800 px-2 py-1 rounded-md">
-                    <span>
-                        <Tag />
-                    </span>
-                    <span className="text-[0.70rem]">Tugg Speedman</span>
-                </div>
-                <div className="w-fit flex gap-2 items-center bg-purple-100 text-purple-800 px-2 py-1 rounded-md">
-                    <span>
-                        <Tag />
-                    </span>
-                    <span className="text-[0.70rem]">Movis The Dog</span>
-                </div>
-                <div className="w-fit flex gap-2 items-center bg-purple-100 text-purple-800 px-2 py-1 rounded-md">
-                    <span>
-                        <Tag />
-                    </span>
-                    <span className="text-[0.70rem]">
-                        Cutiieee Puttieee Nenuuu-chaaannn
-                    </span>
-                </div>
+                {tags.map((tag) => {
+                    return (
+                        <div
+                            key={tag._id}
+                            className="w-fit flex gap-2 items-center bg-purple-100 text-purple-800 px-2 py-1 rounded-md"
+                        >
+                            <span>
+                                <Tag />
+                            </span>
+                            <span className="text-[0.70rem]">{tag.title}</span>
+                        </div>
+                    );
+                })}
             </div>
         </div>
     );

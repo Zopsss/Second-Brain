@@ -10,7 +10,7 @@ export { default as Link2 } from "./Link2";
 export { default as YouTube } from "./YouTube";
 export { default as Add } from "./Add";
 export { default as Lock } from "./Lock";
-export { default as Mail } from "./Mail";
+export { default as Username } from "./Username";
 export { default as Tag } from "./Tag";
 export { default as Close } from "./Close";
 export { default as Hamburger } from "./Hamburger";
