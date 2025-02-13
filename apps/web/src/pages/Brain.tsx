@@ -1,19 +1,50 @@
-import { useState } from "react";
 import LinkCard from "../components/LinkCard";
-import { data } from "./data";
+import { useQuery } from "@tanstack/react-query";
+import axios from "axios";
+import { useParams } from "react-router";
+import { ENV_VARS } from "../constants/envs";
+
+interface BrainLinkType {
+    _id: string;
+    link: string;
+    title: string;
+    type: string;
+    tags: [{ _id: string; title: string }];
+}
 
 const Brain = () => {
-    const [link, setLink] = useState(
-        "https://www.instagram.com/stories/highlights/17973534050748450/"
-    );
+    const { brainLink } = useParams();
+    const { isLoading, error, data } = useQuery<BrainLinkType[]>({
+        queryKey: ["brainContent"],
+        queryFn: async () => {
+            const { data } = await axios.get(
+                `${ENV_VARS.BACKEND_URL}/brain/${brainLink}`
+            );
+            console.log(data);
+            return data.brainContent;
+        },
+    });
 
-    // TODO: fix <LinkCard /> component
     return (
-        <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3 p-6">
-            {data.map((l) => {
-                return <LinkCard title={title} link={link} />;
-            })}
-            ;
+        <div
+            className={`grid p-6 ${((isLoading || error) && "w-full text-center") || (data && data.length > 0 && "grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3")}`}
+        >
+            {isLoading ? (
+                <h1 className="font-bold">Loading....</h1>
+            ) : error ? (
+                <h1>{error.message}</h1>
+            ) : (
+                data?.map((link) => {
+                    return (
+                        <LinkCard
+                            key={link._id}
+                            title={link.title}
+                            link={link.link}
+                            tags={link.tags}
+                        />
+                    );
+                })
+            )}
         </div>
     );
 };

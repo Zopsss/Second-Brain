@@ -38,6 +38,7 @@ const AddLinkModal = ({
 
     const mutation = useMutation({
         mutationFn: async (newData: ContentType) => {
+            console.log(newData);
             return await axios.post(
                 `${ENV_VARS.BACKEND_URL}/content/`,
                 newData,

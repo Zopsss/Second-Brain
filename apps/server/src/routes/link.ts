@@ -3,41 +3,26 @@ import { Router } from "express";
 import { brainLinkModel, contentModel, userModel } from "../db";
 import { userAuthMiddleware } from "../middlewares";
 import { MongoServerError } from "mongodb";
-import mongoose from "mongoose";
 
 export const linkRouter = Router();
 
 // generating link
 linkRouter.post("/", userAuthMiddleware, async (req, res) => {
-    console.log("in endpoint");
     const userId = req.userId;
-    const session = await mongoose.startSession();
-    await session.startTransaction();
 
     try {
         const hash = uuidv4();
-        const link = "https://second-brain.com/share" + hash;
+        const link = "http://localhost:5173/share/" + hash;
         const brainLink = await brainLinkModel.create({
             link,
             share: true,
             userId,
         });
 
-        console.log(brainLink);
-        await userModel.updateOne(
-            { _id: userId },
-            { $set: { hasBrainLink: true } }
-        );
-
-        await session.commitTransaction();
-        await session.endSession();
-
         res.status(200).json({ brainLink });
     } catch (error) {
         console.log(error);
 
-        await session.abortTransaction();
-        await session.endSession();
         if (error instanceof MongoServerError && error.code === 11000) {
             res.status(403).json({
                 msg: "brain-link for this user already exists.",
@@ -91,15 +76,12 @@ linkRouter.put("/regenerate-link", userAuthMiddleware, async (req, res) => {
 
     try {
         const hash = uuidv4();
-        console.log(hash);
-        const brainLink = "https://second-brain.com/share" + hash;
+        const brainLink = "http://localhost:5173/share/" + hash;
         const newBrainLink = await brainLinkModel.findOneAndUpdate(
             { userId },
             { link: brainLink },
             { new: true }
         );
-
-        console.log(newBrainLink);
 
         // we don't really need this if/else as we're ensuring that this endpoint
         // is only accessible when user has generted brain-link in frontend,
@@ -144,7 +126,9 @@ linkRouter.get("/:shareLink", async (req, res) => {
     const shareLink: string = req.params.shareLink;
 
     try {
-        const brainLink = await brainLinkModel.findOne({ hash: shareLink });
+        const brainLink = await brainLinkModel.findOne({
+            link: "http://localhost:5173/share/" + shareLink,
+        });
 
         if (brainLink) {
             const brainContent = await contentModel

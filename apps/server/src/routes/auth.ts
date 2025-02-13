@@ -77,7 +77,6 @@ authRouter.post("/signup", async (req, res) => {
         const user = await userModel.create({
             username,
             password: hashedPassword,
-            hasBrainLink: false,
         });
 
         const token = jwt.sign(

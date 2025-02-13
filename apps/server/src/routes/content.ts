@@ -8,6 +8,7 @@ export const contentRouter = Router();
 // adding content
 contentRouter.post("/", userAuthMiddleware, async (req, res) => {
     const { link, title, tags } = req.body;
+    console.log("outside: ", tags);
     const userId = req.userId;
     let type;
 
@@ -26,7 +27,7 @@ contentRouter.post("/", userAuthMiddleware, async (req, res) => {
     try {
         let associatedTagIds: Types.ObjectId[] = [];
 
-        if (tags && tags.length > 1) {
+        if (tags && tags.length > 0) {
             // Using a for...of loop to handle asynchronous operations properly
             for (const title of tags) {
                 const newOrExistingTag = await tagsModel.findOneAndUpdate(

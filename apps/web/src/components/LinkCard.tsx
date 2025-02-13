@@ -1,4 +1,3 @@
-import { SetStateAction } from "react";
 import { Tag, YouTube } from "./icons";
 import Delete from "./icons/Delete";
 
@@ -10,12 +9,12 @@ const LinkCard = ({
     setShowConfirmationModal,
     setLink,
 }: {
-    id: string;
+    id?: string;
     title: string;
     link: string;
     tags: [{ _id: string; title: string }];
     setShowConfirmationModal?: React.Dispatch<React.SetStateAction<boolean>>;
-    setLink: React.Dispatch<
+    setLink?: React.Dispatch<
         React.SetStateAction<{
             id: string;
             link: string;
@@ -33,12 +32,12 @@ const LinkCard = ({
                         </div>
                         <h1 className="break-all">{title}</h1>
                     </div>
-                    {setShowConfirmationModal && (
+                    {setShowConfirmationModal && id && (
                         <div
                             className="cursor-pointer text-slate-700"
                             onClick={() => {
                                 setShowConfirmationModal(true);
-                                setLink({ id, title, link });
+                                setLink?.({ id, title, link });
                             }}
                         >
                             <Delete />

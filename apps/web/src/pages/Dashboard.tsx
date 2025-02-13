@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useState } from "react";
 import AddLinkModal from "../components/AddLinkModal";
 import LinkCard from "../components/LinkCard";
 import Sidebar from "../components/Sidebar";
@@ -49,6 +49,7 @@ const Dashboard = () => {
 
     useEffect(() => {
         if (!token) navigate("/login");
+        setToken(token);
 
         const fetchBrainLink = async () => {
             try {
@@ -59,6 +60,7 @@ const Dashboard = () => {
                     }
                 );
 
+                console.log(fetchBrainLink);
                 setBrainLink((e) => ({ ...e, link: data.brainLink.link }));
             } catch (error) {
                 console.log("user doesnt have brain link.");

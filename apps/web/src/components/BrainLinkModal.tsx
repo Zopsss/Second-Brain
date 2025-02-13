@@ -1,7 +1,7 @@
 import { Close } from "./icons";
 import Button from "./ui/Button";
 import { useOnClickOutside } from "usehooks-ts";
-import { useEffect, useRef, useState } from "react";
+import { useRef, useState } from "react";
 import GenerateLinkInput from "./ui/GenerateLinkInput";
 import axios from "axios";
 import { ENV_VARS } from "../constants/envs";
@@ -25,22 +25,10 @@ const BrainLinkModal = ({
     const modalRef = useRef(null);
     const [isBrainEnabled, setIsBrainEnabled] = useState(true);
 
-    useOnClickOutside(modalRef, () =>
-        setBrainLink((e) => ({ ...e, show: false }))
-    );
-
-    useEffect(() => {
-        const updateShareStatus = async () => {
-            const { data } = await axios.put(
-                `${ENV_VARS.BACKEND_URL}/brain/update-share`,
-                { share: isBrainEnabled },
-                { headers: { Authorization: token } }
-            );
-
-            console.log(data);
-        };
-        updateShareStatus();
-    }, [isBrainEnabled]);
+    useOnClickOutside(modalRef, () => {
+        console.log("object");
+        setBrainLink((e) => ({ ...e, show: false }));
+    });
 
     const generateBrainLink = async () => {
         const { data } = await axios.post(
@@ -72,6 +60,7 @@ const BrainLinkModal = ({
             toastMessage: "Brain Link Regnerated.",
             id: Date.now(),
         });
+        setShowToast(true);
     };
 
     const MiddleContent = () => {
