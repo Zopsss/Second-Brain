@@ -8,7 +8,6 @@ export const contentRouter = Router();
 // adding content
 contentRouter.post("/", userAuthMiddleware, async (req, res) => {
     const { link, title, tags } = req.body;
-    console.log("outside: ", tags);
     const userId = req.userId;
     let type;
 
@@ -66,19 +65,30 @@ contentRouter.post("/", userAuthMiddleware, async (req, res) => {
     }
 });
 
-// getting content
-contentRouter.get("/", userAuthMiddleware, async (req, res) => {
+contentRouter.get("/:type", userAuthMiddleware, async (req, res) => {
     const userId = req.userId;
+    const { type } = req.params;
 
     try {
+        if (type === "all-links") {
+            const response = await contentModel
+                .find({ userId })
+                .populate({ path: "tags", select: "title" });
+
+            res.status(200).json({ response });
+            return;
+        }
+
         const response = await contentModel
-            .find({ userId })
+            .find({ userId, type })
             .populate({ path: "tags", select: "title" });
 
+        console.log(response);
         res.status(200).json({ response });
     } catch (error) {
-        console.log(error);
-        res.status(500).json({ msg: "Error while retrieving content" });
+        res.status(500).json({
+            msg: "error while fetching content with given type.",
+        });
     }
 });
 

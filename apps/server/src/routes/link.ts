@@ -12,6 +12,7 @@ linkRouter.post("/", userAuthMiddleware, async (req, res) => {
 
     try {
         const hash = uuidv4();
+        // TODO: Fix this before deploying.
         const link = "http://localhost:5173/share/" + hash;
         const brainLink = await brainLinkModel.create({
             link,

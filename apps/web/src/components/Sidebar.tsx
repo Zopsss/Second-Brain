@@ -1,44 +1,33 @@
-import { useEffect, useRef, useState } from "react";
+import { useRef } from "react";
 import { Instagram, YouTube, Reddit, Notion, X, Link } from "./icons";
 import { useOnClickOutside } from "usehooks-ts";
 
 const Sidebar = ({
     sidebarOpen,
+    activeItem,
+    setActiveItem,
     setSidebarOpen,
 }: {
     sidebarOpen: boolean;
+    activeItem: string;
+    setActiveItem: React.Dispatch<React.SetStateAction<string>>;
     setSidebarOpen: React.Dispatch<React.SetStateAction<boolean>>;
 }) => {
     const sidebarItems = [
         ["all-links", "All links", <Link />],
-        ["youtube", "YouTube", <YouTube />],
-        ["instagram", "Instagram", <Instagram />],
-        ["twitter", "X ( Twitter )", <X />],
-        ["reddit", "Reddit", <Reddit />],
-        ["notion", "Notion", <Notion />],
-        ["others", "Others", <Link />],
+        ["YouTube", "YouTube", <YouTube />],
+        ["Instagram", "Instagram", <Instagram />],
+        ["X", "X ( Twitter )", <X />],
+        ["Reddit", "Reddit", <Reddit />],
+        ["Notion", "Notion", <Notion />],
+        ["Others", "Others", <Link />],
     ];
-
-    const [activeItem, setActiveItem] = useState("");
 
     const handleClick = (key: string) => {
         setActiveItem(key);
         const newUrl = `${window.location.pathname}?active=${key}`;
         window.history.replaceState(null, "", newUrl);
     };
-
-    useEffect(() => {
-        const queryParam = new URLSearchParams(window.location.search);
-        const active = queryParam.get("active");
-
-        if (active) {
-            setActiveItem(active);
-        } else {
-            const newUrl = `${window.location.pathname}?active=all-links`;
-            window.history.replaceState(null, "", newUrl);
-            setActiveItem("all-links");
-        }
-    }, []);
 
     const sidebarRef = useRef(null);
     useOnClickOutside(sidebarRef, () => setSidebarOpen(false));
@@ -55,7 +44,7 @@ const Sidebar = ({
                             ? "block motion-preset-slide-right"
                             : "motion-translate-x-out-[-100%] motion-duration-700 motion-opacity-out-0 motion-ease-in-out"
                     }
-                    `}
+                        `}
             >
                 <h1 className="font-semibold text-xl ml-3">My Links</h1>
                 <div className="mt-6 w-56 flex flex-col gap-3">
@@ -77,9 +66,10 @@ const Sidebar = ({
                                     <span>{icon}</span>
                                     <h1>{title}</h1>
                                 </div>
-                                <div className="bg-slate-100 px-2 text-sm rounded-full">
+                                {/* TODO: Find a good way to show link counts */}
+                                {/* <div className="bg-slate-100 px-2 text-sm rounded-full">
                                     1
-                                </div>
+                                </div> */}
                             </div>
                         );
                     })}

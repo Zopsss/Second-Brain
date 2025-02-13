@@ -17,7 +17,7 @@ const ContentSchema = new Schema(
         link: { type: String, required: true },
         type: {
             type: String,
-            enum: ["YouTube", "Notion", "X", "Instagram", "Others"],
+            enum: ["YouTube", "Notion", "X", "Instagram", "Reddit", "Others"],
             required: true,
         },
         title: { type: String, required: true },

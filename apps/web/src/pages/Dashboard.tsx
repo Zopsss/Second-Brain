@@ -9,10 +9,10 @@ import ConfirmationModal from "../components/ConfirmationModal";
 import { useNavigate } from "react-router";
 import axios from "axios";
 import { ENV_VARS } from "../constants/envs";
-import { useQuery } from "@tanstack/react-query";
+import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { BrainLinkModalType } from "../types";
 
-interface UserDataType {
+interface ContentDataType {
     _id: string;
     createdAt: string;
     link: string;
@@ -32,6 +32,7 @@ const Dashboard = () => {
     const [showConfirmationModal, setShowConfirmationModal] = useState(false);
     const [sidebarOpen, setSidebarOpen] = useState(false);
     const [showToast, setShowToast] = useState(false);
+    const [activeItem, setActiveItem] = useState("all-links");
     const [link, setLink] = useState<{
         id: string;
         link: string;
@@ -60,7 +61,6 @@ const Dashboard = () => {
                     }
                 );
 
-                console.log(fetchBrainLink);
                 setBrainLink((e) => ({ ...e, link: data.brainLink.link }));
             } catch (error) {
                 console.log("user doesnt have brain link.");
@@ -68,18 +68,32 @@ const Dashboard = () => {
         };
 
         fetchBrainLink();
+
+        const queryParam = new URLSearchParams(window.location.search);
+        const active = queryParam.get("active");
+
+        if (active) {
+            setActiveItem(active);
+        } else {
+            const newUrl = `${window.location.pathname}?active=all-links`;
+            window.history.replaceState(null, "", newUrl);
+            setActiveItem("all-links");
+        }
     }, [token, navigate]);
 
     const fetchUserData = async () => {
-        const { data } = await axios.get(`${ENV_VARS.BACKEND_URL}/content/`, {
-            headers: {
-                Authorization: token,
-            },
-        });
+        const { data } = await axios.get(
+            `${ENV_VARS.BACKEND_URL}/content/${activeItem}`,
+            {
+                headers: {
+                    Authorization: token,
+                },
+            }
+        );
         return data.response;
     };
 
-    const { isLoading, data, error } = useQuery<UserDataType[]>({
+    const { isLoading, data, error } = useQuery<ContentDataType[]>({
         queryKey: ["userData"],
         queryFn: fetchUserData,
         enabled: !!token,
@@ -89,6 +103,8 @@ const Dashboard = () => {
         <>
             <div className="h-[calc(100vh-64px)] bg-slate-50 flex">
                 <Sidebar
+                    activeItem={activeItem}
+                    setActiveItem={setActiveItem}
                     sidebarOpen={sidebarOpen}
                     setSidebarOpen={setSidebarOpen}
                 />
@@ -114,30 +130,30 @@ const Dashboard = () => {
                                 Error: {error.message}
                             </span>
                         </div>
-                    ) : data?.length === 0 || data === undefined ? (
+                    ) : data === undefined || data.length === 0 ? (
                         <div className="flex-1 flex justify-center items-center text-center">
                             <h1 className="font-semibold text-lg">
-                                Seems like you haven't stored any links yet.
-                                <br />
-                                Click on "Add Link" button to start storing your
-                                links.
+                                Oops looks like there is no Content ;-;
                             </h1>
                         </div>
                     ) : (
                         <div className="p-6 overflow-y-auto grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3">
-                            {data.map((link) => (
-                                <LinkCard
-                                    key={link._id}
-                                    title={link.title}
-                                    link={link.link}
-                                    tags={link.tags}
-                                    id={link._id}
-                                    setLink={setLink}
-                                    setShowConfirmationModal={
-                                        setShowConfirmationModal
-                                    }
-                                />
-                            ))}
+                            {data.map((link) => {
+                                return (
+                                    <LinkCard
+                                        key={link._id}
+                                        title={link.title}
+                                        link={link.link}
+                                        type={link.type}
+                                        tags={link.tags}
+                                        id={link._id}
+                                        setLink={setLink}
+                                        setShowConfirmationModal={
+                                            setShowConfirmationModal
+                                        }
+                                    />
+                                );
+                            })}
                         </div>
                     )}
                 </main>

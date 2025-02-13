@@ -1,10 +1,20 @@
-import { Tag, YouTube } from "./icons";
+import { Instagram, Link, Notion, Reddit, Tag, X, YouTube } from "./icons";
 import Delete from "./icons/Delete";
+
+const linkTypeMap = new Map([
+    ["YouTube", <YouTube />],
+    ["Instagram", <Instagram />],
+    ["X", <X />],
+    ["Reddit", <Reddit />],
+    ["Notion", <Notion />],
+    ["Others", <Link />],
+]);
 
 const LinkCard = ({
     id,
     link,
     title,
+    type,
     tags,
     setShowConfirmationModal,
     setLink,
@@ -12,6 +22,7 @@ const LinkCard = ({
     id?: string;
     title: string;
     link: string;
+    type: string;
     tags: [{ _id: string; title: string }];
     setShowConfirmationModal?: React.Dispatch<React.SetStateAction<boolean>>;
     setLink?: React.Dispatch<
@@ -28,7 +39,7 @@ const LinkCard = ({
                 <div className="flex items-center justify-between">
                     <div className="flex items-center gap-3">
                         <div className="text-slate-500">
-                            <YouTube />
+                            {linkTypeMap.get(type)}
                         </div>
                         <h1 className="break-all">{title}</h1>
                     </div>

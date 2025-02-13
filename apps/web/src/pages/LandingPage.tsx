@@ -26,7 +26,7 @@ const LandingPage = ({ isAuth }: { isAuth: boolean }) => {
                         beautiful interface.
                     </p>
                     <div className="flex gap-3 items-center justify-center mt-5">
-                        <RouterLink to="/dashboard">
+                        <RouterLink to="/login">
                             <Button variant="Primary" title="Get Started" />
                         </RouterLink>
                     </div>

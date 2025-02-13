@@ -38,6 +38,7 @@ const Searchbar = ({
                 { title: title, tags: tags },
                 { headers: { Authorization: token } }
             );
+            console.log(data);
             return data.fetchedContent;
         },
         onSuccess: (data) => {
@@ -47,6 +48,7 @@ const Searchbar = ({
 
     const debouncedCallback = useDebounceCallback(() => {
         if (title.trim() !== "" || tags.length >= 1) {
+            console.log(tags);
             mutation.mutate({ title: title, tags: tags });
             return;
         }
@@ -69,19 +71,21 @@ const Searchbar = ({
                     <Hamburger className="motion-preset-fade-lg" />
                 )}
             </span>
-            <Input
-                className="flex-1"
-                placeholder="Search by title..."
-                leftIcon={<Search />}
-                {...register("title")}
-            />
-            <InputTags
-                tags={tags}
-                setValue={setValue}
-                className="flex-1"
-                placeholder="Search by tags..."
-                leftIcon={<Search />}
-            />
+            <div className="grid grid-cols-1 flex-1 gap-2 lg:grid-cols-2">
+                <Input
+                    className="flex-1"
+                    placeholder="Search by title..."
+                    leftIcon={<Search />}
+                    {...register("title")}
+                />
+                <InputTags
+                    tags={tags}
+                    setValue={setValue}
+                    className="flex-1"
+                    placeholder="Search by tags..."
+                    leftIcon={<Search />}
+                />
+            </div>
             <Button
                 variant="Outline"
                 title="Brain Link"

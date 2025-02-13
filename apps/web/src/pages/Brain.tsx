@@ -38,6 +38,7 @@ const Brain = () => {
                     return (
                         <LinkCard
                             key={link._id}
+                            type={link.type}
                             title={link.title}
                             link={link.link}
                             tags={link.tags}
