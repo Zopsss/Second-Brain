@@ -26,7 +26,6 @@ const BrainLinkModal = ({
     const [isBrainEnabled, setIsBrainEnabled] = useState(true);
 
     useOnClickOutside(modalRef, () => {
-        console.log("object");
         setBrainLink((e) => ({ ...e, show: false }));
     });
 
@@ -48,19 +47,26 @@ const BrainLinkModal = ({
     };
 
     const handleRegenerateBrainLink = async () => {
-        const { data } = await axios.put(
-            `${ENV_VARS.BACKEND_URL}/brain/regenerate-link`,
-            {},
-            { headers: { Authorization: token } }
-        );
+        try {
+            const { data } = await axios.put(
+                `${ENV_VARS.BACKEND_URL}/brain/regenerate-link`,
+                {},
+                { headers: { Authorization: token } }
+            );
 
-        console.log(data);
-        setBrainLink((e) => ({ ...e, link: data.newBrainLink.link }));
-        setToastMessage({
-            toastMessage: "Brain Link Regnerated.",
-            id: Date.now(),
-        });
-        setShowToast(true);
+            setBrainLink((e) => ({ ...e, link: data.newBrainLink.link }));
+            setToastMessage({
+                toastMessage: "Brain Link Regnerated.",
+                id: Date.now(),
+            });
+            setShowToast(true);
+        } catch (error) {
+            setToastMessage({
+                toastMessage: "Failed to regenerate link, please try again :(",
+                id: Date.now(),
+            });
+            setShowToast(true);
+        }
     };
 
     const MiddleContent = () => {

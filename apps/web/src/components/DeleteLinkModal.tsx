@@ -12,16 +12,16 @@ interface LinkType {
     title: string;
 }
 
-const ConfirmationModal = ({
+const DeleteLinkModal = ({
     link,
     token,
-    setShowConfirmationModal,
+    setShowDeleteModal,
     setShowToast,
     setToastMessage,
 }: {
     link: LinkType;
     token: string | null;
-    setShowConfirmationModal: React.Dispatch<React.SetStateAction<boolean>>;
+    setShowDeleteModal: React.Dispatch<React.SetStateAction<boolean>>;
     setShowToast: React.Dispatch<React.SetStateAction<boolean>>;
     setToastMessage: React.Dispatch<
         React.SetStateAction<{ id: number; toastMessage: string }>
@@ -29,7 +29,7 @@ const ConfirmationModal = ({
 }) => {
     const modalRef = useRef(null);
 
-    useOnClickOutside(modalRef, () => setShowConfirmationModal(false));
+    useOnClickOutside(modalRef, () => setShowDeleteModal(false));
 
     const queryClient = useQueryClient();
 
@@ -44,21 +44,23 @@ const ConfirmationModal = ({
         },
         onSuccess: () =>
             queryClient.invalidateQueries({ queryKey: ["userData"] }),
-        onError: (error) => {
-            alert("Link not deleted, please try again.");
-            console.log(error);
+        onError: () => {
+            setToastMessage({
+                id: Date.now(),
+                toastMessage: "Failed to delete link, please try again :(",
+            });
+            setShowToast(true);
         },
     });
 
     const handleDeleteLink = () => {
-        // console.log("object");
         mutation.mutate(link);
         setToastMessage({
             id: Date.now(),
             toastMessage: "Link deleted successfully!",
         });
         setShowToast(true);
-        setShowConfirmationModal(false);
+        setShowDeleteModal(false);
     };
 
     return (
@@ -71,7 +73,7 @@ const ConfirmationModal = ({
                     <div className="flex w-full justify-end mr-8 mt-4">
                         <button
                             className="cursor-pointer"
-                            onClick={() => setShowConfirmationModal(false)}
+                            onClick={() => setShowDeleteModal(false)}
                         >
                             <Close />
                         </button>
@@ -110,7 +112,7 @@ const ConfirmationModal = ({
                                 title="No"
                                 variant="Primary"
                                 className="w-full"
-                                onClick={() => setShowConfirmationModal(false)}
+                                onClick={() => setShowDeleteModal(false)}
                             />
                         </div>
                     </div>
@@ -120,4 +122,4 @@ const ConfirmationModal = ({
     );
 };
 
-export default ConfirmationModal;
+export default DeleteLinkModal;

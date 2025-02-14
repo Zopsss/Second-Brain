@@ -27,7 +27,6 @@ const GenerateLinkInput: React.FC<InputProps> = ({
                     className="cursor-pointer hover:scale-110 transition-all duration-200"
                     onClick={() => {
                         if (brainLink) {
-                            console.log(brainLink);
                             navigator.clipboard.writeText(brainLink);
                             setToastMessage({
                                 toastMessage: "Brain Link Copied To Clipboard!",

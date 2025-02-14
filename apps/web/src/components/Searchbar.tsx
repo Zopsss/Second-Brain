@@ -1,5 +1,5 @@
 import { useForm } from "react-hook-form";
-import { BrainLinkModalType } from "../types";
+import { BrainLinkModalType, TagsType } from "../types";
 import { Add, Search, Share, Hamburger, Close } from "./icons";
 import Button from "./ui/Button";
 import Input from "./ui/Input";
@@ -26,19 +26,20 @@ const Searchbar = ({
     const queryClient = useQueryClient();
     const { register, watch, setValue } = useForm<{
         title: string;
-        tags: string[];
+        link: string;
+        tags: TagsType[];
     }>();
     const title = watch("title", "");
     const tags = watch("tags", []);
 
     const mutation = useMutation({
-        mutationFn: async ({ title }: { title: string; tags: string[] }) => {
+        mutationFn: async ({ title }: { title: string; tags: TagsType[] }) => {
+            const tagsTitles = tags.map((tag) => tag.title);
             const { data } = await axios.post(
                 `${ENV_VARS.BACKEND_URL}/content/search`,
-                { title: title, tags: tags },
+                { title: title, tags: tagsTitles },
                 { headers: { Authorization: token } }
             );
-            console.log(data);
             return data.fetchedContent;
         },
         onSuccess: (data) => {
@@ -48,7 +49,6 @@ const Searchbar = ({
 
     const debouncedCallback = useDebounceCallback(() => {
         if (title.trim() !== "" || tags.length >= 1) {
-            console.log(tags);
             mutation.mutate({ title: title, tags: tags });
             return;
         }

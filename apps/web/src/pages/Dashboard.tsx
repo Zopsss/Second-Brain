@@ -5,12 +5,13 @@ import Sidebar from "../components/Sidebar";
 import Searchbar from "../components/Searchbar";
 import BrainLinkModal from "../components/BrainLinkModal";
 import Toast from "../components/Toast";
-import ConfirmationModal from "../components/ConfirmationModal";
+import DeleteLinkModal from "../components/DeleteLinkModal";
 import { useNavigate } from "react-router";
 import axios from "axios";
 import { ENV_VARS } from "../constants/envs";
-import { useQuery, useQueryClient } from "@tanstack/react-query";
-import { BrainLinkModalType } from "../types";
+import { useQuery } from "@tanstack/react-query";
+import { BrainLinkModalType, SetLinkType, TagsType } from "../types";
+import UpdateModal from "../components/UpdateLinkModal";
 
 interface ContentDataType {
     _id: string;
@@ -20,7 +21,7 @@ interface ContentDataType {
     type: string;
     updatedAt: string;
     userId: string;
-    tags: [{ _id: string; title: string }];
+    tags: TagsType[];
 }
 
 const Dashboard = () => {
@@ -29,15 +30,17 @@ const Dashboard = () => {
         show: false,
         link: null,
     });
-    const [showConfirmationModal, setShowConfirmationModal] = useState(false);
+    const [showDeleteModal, setShowDeleteModal] = useState(false);
+    const [showUpdateModal, setShowUpdateModal] = useState(false);
     const [sidebarOpen, setSidebarOpen] = useState(false);
     const [showToast, setShowToast] = useState(false);
     const [activeItem, setActiveItem] = useState("all-links");
-    const [link, setLink] = useState<{
-        id: string;
-        link: string;
-        title: string;
-    }>({ id: "", link: "", title: "" });
+    const [link, setLink] = useState<SetLinkType>({
+        id: "",
+        link: "",
+        title: "",
+        tags: [],
+    });
     const [toastMessage, setToastMessage] = useState<{
         id: number;
         toastMessage: string;
@@ -62,9 +65,7 @@ const Dashboard = () => {
                 );
 
                 setBrainLink((e) => ({ ...e, link: data.brainLink.link }));
-            } catch (error) {
-                console.log("user doesnt have brain link.");
-            }
+            } catch (error) {}
         };
 
         fetchBrainLink();
@@ -148,9 +149,8 @@ const Dashboard = () => {
                                         tags={link.tags}
                                         id={link._id}
                                         setLink={setLink}
-                                        setShowConfirmationModal={
-                                            setShowConfirmationModal
-                                        }
+                                        setShowDeleteModal={setShowDeleteModal}
+                                        setShowUpdateModal={setShowUpdateModal}
                                     />
                                 );
                             })}
@@ -171,6 +171,8 @@ const Dashboard = () => {
                     <AddLinkModal
                         token={token}
                         setAddLinkModal={setAddLinkModal}
+                        setShowToast={setShowToast}
+                        setToastMessage={setToastMessage}
                     />
                 )}
                 {showToast && (
@@ -179,11 +181,20 @@ const Dashboard = () => {
                         toastMessage={toastMessage}
                     />
                 )}
-                {showConfirmationModal && (
-                    <ConfirmationModal
+                {showDeleteModal && (
+                    <DeleteLinkModal
                         link={link}
                         token={token}
-                        setShowConfirmationModal={setShowConfirmationModal}
+                        setShowDeleteModal={setShowDeleteModal}
+                        setShowToast={setShowToast}
+                        setToastMessage={setToastMessage}
+                    />
+                )}
+                {showUpdateModal && (
+                    <UpdateModal
+                        link={link}
+                        token={token}
+                        setUpdateModal={setShowUpdateModal}
                         setShowToast={setShowToast}
                         setToastMessage={setToastMessage}
                     />

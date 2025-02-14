@@ -20,7 +20,6 @@ const SignUp = ({ setIsAuth }: { setIsAuth: (arg0: boolean) => void }) => {
     });
 
     const onSubmit: SubmitHandler<SignUpSchemaType> = async (data) => {
-        console.log("object");
         try {
             const response = await axios.post(
                 `${ENV_VARS.BACKEND_URL}/auth/signup`,

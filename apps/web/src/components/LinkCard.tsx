@@ -1,4 +1,14 @@
-import { Instagram, Link, Notion, Reddit, Tag, X, YouTube } from "./icons";
+import { SetLinkType, TagsType } from "../types";
+import {
+    Instagram,
+    Link,
+    Notion,
+    Pencil,
+    Reddit,
+    Tag,
+    X,
+    YouTube,
+} from "./icons";
 import Delete from "./icons/Delete";
 
 const linkTypeMap = new Map([
@@ -16,22 +26,18 @@ const LinkCard = ({
     title,
     type,
     tags,
-    setShowConfirmationModal,
+    setShowDeleteModal,
+    setShowUpdateModal,
     setLink,
 }: {
     id?: string;
     title: string;
     link: string;
     type: string;
-    tags: [{ _id: string; title: string }];
-    setShowConfirmationModal?: React.Dispatch<React.SetStateAction<boolean>>;
-    setLink?: React.Dispatch<
-        React.SetStateAction<{
-            id: string;
-            link: string;
-            title: string;
-        }>
-    >;
+    tags: TagsType[];
+    setShowDeleteModal?: React.Dispatch<React.SetStateAction<boolean>>;
+    setShowUpdateModal?: React.Dispatch<React.SetStateAction<boolean>>;
+    setLink?: React.Dispatch<React.SetStateAction<SetLinkType>>;
 }) => {
     return (
         <div className="bg-white p-5 rounded-lg drop-shadow-md hover:drop-shadow-lg transition-all duration-200">
@@ -43,17 +49,29 @@ const LinkCard = ({
                         </div>
                         <h1 className="break-all">{title}</h1>
                     </div>
-                    {setShowConfirmationModal && id && (
-                        <div
-                            className="cursor-pointer text-slate-700"
-                            onClick={() => {
-                                setShowConfirmationModal(true);
-                                setLink?.({ id, title, link });
-                            }}
-                        >
-                            <Delete />
-                        </div>
-                    )}
+                    {setShowDeleteModal &&
+                        setShowUpdateModal &&
+                        setLink &&
+                        id && (
+                            <div className="cursor-pointer text-slate-700 flex items-center gap-2">
+                                <span
+                                    onClick={() => {
+                                        setShowUpdateModal(true);
+                                        setLink({ id, title, link, tags });
+                                    }}
+                                >
+                                    <Pencil />
+                                </span>
+                                <span
+                                    onClick={() => {
+                                        setShowDeleteModal(true);
+                                        setLink({ id, title, link, tags });
+                                    }}
+                                >
+                                    <Delete />
+                                </span>
+                            </div>
+                        )}
                 </div>
                 <div>
                     <p className="text-purple-600 w-fit ml-9 mt-1">

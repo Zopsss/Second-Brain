@@ -8,16 +8,18 @@ import { useMutation, useQueryClient } from "@tanstack/react-query";
 import axios from "axios";
 import { ENV_VARS } from "../constants/envs";
 import InputTags from "./ui/InputTags";
-import { ContentType } from "../types";
+import { ContentType, SetLinkType } from "../types";
 
-const AddLinkModal = ({
+const UpdateLinkModal = ({
     token,
-    setAddLinkModal,
+    link,
+    setUpdateModal,
     setShowToast,
     setToastMessage,
 }: {
+    link: SetLinkType;
     token: string | null;
-    setAddLinkModal: React.Dispatch<React.SetStateAction<boolean>>;
+    setUpdateModal: React.Dispatch<React.SetStateAction<boolean>>;
     setShowToast: React.Dispatch<React.SetStateAction<boolean>>;
     setToastMessage: React.Dispatch<
         React.SetStateAction<{ id: number; toastMessage: string }>
@@ -30,20 +32,26 @@ const AddLinkModal = ({
         watch,
         setValue,
         formState: { errors },
-    } = useForm<ContentType>();
-    const tags = watch("tags", []);
+    } = useForm<ContentType>({
+        defaultValues: {
+            link: link.link,
+            title: link.title,
+            tags: link.tags,
+        },
+    });
 
-    useOnClickOutside(modalRef, () => setAddLinkModal(false));
+    useOnClickOutside(modalRef, () => setUpdateModal(false));
     const queryClient = useQueryClient();
+    const tags = watch("tags", link.tags);
 
     const mutation = useMutation({
         mutationFn: async (newData: ContentType) => {
             // TODO: fix any type
             const finalData: any = newData;
             finalData.tags = finalData.tags.map((tag: any) => tag.title);
-            return await axios.post(
+            return await axios.put(
                 `${ENV_VARS.BACKEND_URL}/content/`,
-                newData,
+                finalData,
                 {
                     headers: {
                         Authorization: token,
@@ -51,20 +59,26 @@ const AddLinkModal = ({
                 }
             );
         },
-        onSuccess: () =>
-            queryClient.invalidateQueries({ queryKey: ["userData"] }),
+        onSuccess: () => {
+            queryClient.invalidateQueries({ queryKey: ["userData"] });
+            setToastMessage({
+                id: Date.now(),
+                toastMessage: "Link updated successfully!",
+            });
+            setShowToast(true);
+        },
         onError: () => {
             setToastMessage({
                 id: Date.now(),
-                toastMessage: "Failed to add link, please try again :(",
+                toastMessage: "Failed to update link :(",
             });
             setShowToast(true);
         },
     });
 
     const onSubmit: SubmitHandler<ContentType> = (data) => {
-        mutation.mutate(data);
-        setAddLinkModal(false);
+        mutation.mutate({ ...data, contentId: link.id });
+        setUpdateModal(false);
     };
 
     return (
@@ -74,10 +88,10 @@ const AddLinkModal = ({
                 className="bg-white max-w-md w-full rounded-lg shadow-lg p-4 modal-animation"
             >
                 <div className="flex items-center justify-between gap-5 mb-5">
-                    <h1 className="font-semibold">Add New Link</h1>
+                    <h1 className="font-semibold">Update Link</h1>
                     <button
                         className="cursor-pointer"
-                        onClick={() => setAddLinkModal(false)}
+                        onClick={() => setUpdateModal(false)}
                     >
                         <Close />
                     </button>
@@ -91,7 +105,7 @@ const AddLinkModal = ({
                             URL
                         </label>
                         <Input
-                            placeholder="https://example.com"
+                            placeholder={link.link}
                             leftIcon={<Link2 />}
                             type="url"
                             {...register("link")}
@@ -103,7 +117,7 @@ const AddLinkModal = ({
                             Title
                         </label>
                         <Input
-                            placeholder="My Title..."
+                            placeholder={link.title}
                             leftIcon={<Pencil />}
                             {...register("title")}
                             required
@@ -134,4 +148,4 @@ const AddLinkModal = ({
     );
 };
 
-export default AddLinkModal;
+export default UpdateLinkModal;

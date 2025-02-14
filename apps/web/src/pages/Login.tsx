@@ -33,7 +33,6 @@ const Login = ({ setIsAuth }: { setIsAuth: (arg0: boolean) => void }) => {
             if (axios.isAxiosError(error)) {
                 if (error.response) {
                     const { data, status } = error.response;
-                    console.log(data.msg);
                     switch (status) {
                         case 403:
                             setError("root", { message: data.msg });

@@ -5,6 +5,23 @@ import { Types } from "mongoose";
 
 export const contentRouter = Router();
 
+const convertTagsToAssociatedTagsIds = async (tags: string[]) => {
+    let associatedTagIds: Types.ObjectId[] = [];
+
+    // Using a for...of loop to handle asynchronous operations properly
+    for (const title of tags) {
+        const newOrExistingTag = await tagsModel.findOneAndUpdate(
+            { title },
+            { title },
+            { upsert: true, new: true }
+        );
+
+        associatedTagIds.push(newOrExistingTag._id);
+    }
+
+    return associatedTagIds;
+};
+
 // adding content
 contentRouter.post("/", userAuthMiddleware, async (req, res) => {
     const { link, title, tags } = req.body;
@@ -24,19 +41,8 @@ contentRouter.post("/", userAuthMiddleware, async (req, res) => {
     }
 
     try {
-        let associatedTagIds: Types.ObjectId[] = [];
-
         if (tags && tags.length > 0) {
-            // Using a for...of loop to handle asynchronous operations properly
-            for (const title of tags) {
-                const newOrExistingTag = await tagsModel.findOneAndUpdate(
-                    { title },
-                    { title },
-                    { upsert: true, new: true }
-                );
-
-                associatedTagIds.push(newOrExistingTag._id);
-            }
+            let associatedTagIds = await convertTagsToAssociatedTagsIds(tags);
 
             const createdContent = await contentModel.create({
                 link,
@@ -165,16 +171,23 @@ contentRouter.post("/search", userAuthMiddleware, async (req, res) => {
 // updating content
 contentRouter.put("/", userAuthMiddleware, async (req, res) => {
     const userId = req.userId;
-    const { contentId, title, link } = req.body;
+    const { contentId, title, link, tags } = req.body;
 
     if (!contentId) {
         res.status(400).json({ msg: "No content id provided to update." });
         return;
     }
 
-    const updatedFields: Partial<{ title: string; link: string }> = {};
+    const updatedFields: Partial<{
+        title: string;
+        link: string;
+        tags: Types.ObjectId[];
+    }> = {};
     if (link) updatedFields.link = link;
     if (title) updatedFields.title = title;
+    if (tags && tags.length > 0) {
+        updatedFields.tags = await convertTagsToAssociatedTagsIds(tags);
+    }
 
     try {
         const updatedContent = await contentModel
