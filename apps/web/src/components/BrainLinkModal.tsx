@@ -69,6 +69,33 @@ const BrainLinkModal = ({
         }
     };
 
+    const handleBrainSharingLinkStatus = async () => {
+        const newStatus = !isBrainEnabled;
+        let message;
+        if (newStatus) {
+            message = "Brain sharing is enabled!";
+        } else {
+            message = "Brain sharing is disabled.";
+        }
+
+        try {
+            await axios.put(
+                `${ENV_VARS.BACKEND_URL}/brain/update-share`,
+                { share: newStatus },
+                {
+                    headers: { Authorization: token },
+                }
+            );
+
+            setToastMessage({
+                toastMessage: message,
+                id: Date.now(),
+            });
+            setShowToast(true);
+            setIsBrainEnabled(newStatus);
+        } catch (error) {}
+    };
+
     const MiddleContent = () => {
         if (brainLink.link) {
             return (
@@ -89,8 +116,8 @@ const BrainLinkModal = ({
                             <p>Enable Sharing Brain Link.</p>
                             <span className="cursor-pointer transition-all">
                                 <button
-                                    onClick={() =>
-                                        setIsBrainEnabled(!isBrainEnabled)
+                                    onClick={async () =>
+                                        await handleBrainSharingLinkStatus()
                                     }
                                     className={`${
                                         isBrainEnabled

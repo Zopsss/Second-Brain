@@ -40,7 +40,7 @@ const AddLinkModal = ({
         mutationFn: async (newData: ContentType) => {
             // TODO: fix any type
             const finalData: any = newData;
-            finalData.tags = finalData.tags.map((tag: any) => tag.title);
+            finalData.tags = finalData.tags?.map((tag: any) => tag.title) ?? [];
             return await axios.post(
                 `${ENV_VARS.BACKEND_URL}/content/`,
                 newData,

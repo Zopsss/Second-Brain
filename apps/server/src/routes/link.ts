@@ -63,7 +63,7 @@ linkRouter.put("/update-share", userAuthMiddleware, async (req, res) => {
         }
 
         res.status(200).json({
-            link: updatedLink,
+            updatedLink,
         });
     } catch (error) {
         res.status(500).json({
@@ -132,6 +132,12 @@ linkRouter.get("/:shareLink", async (req, res) => {
         });
 
         if (brainLink) {
+            if (!brainLink.share) {
+                res.status(404).json({
+                    msg: "User has disabled brain sharing.",
+                });
+                return;
+            }
             const brainContent = await contentModel
                 .find({
                     userId: brainLink.userId,
