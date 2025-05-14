@@ -30,5 +30,6 @@
     "mongoose": "^8.9.3",
     "uuid": "^11.0.3",
     "zod": "^3.24.1"
-  }
+  },
+  "packageManager": "pnpm@9.15.3"
 }
