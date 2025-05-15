@@ -9,7 +9,12 @@ const port = Number(process.env.PORT || 8080);
 
 const app = express();
 app.options("*", cors());
-app.use(cors());
+app.use(
+    cors({
+        origin: "*",
+        credentials: true,
+    })
+);
 app.use(json());
 
 declare global {
