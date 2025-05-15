@@ -4,12 +4,13 @@ import cors from "cors";
 import "dotenv/config";
 import { authRouter, contentRouter } from "./routes/index";
 import { linkRouter } from "./routes/link";
-import { userAuthMiddleware } from "./middlewares";
-import { userModel } from "./db";
+
+const port = Number(process.env.PORT || 8080);
 
 const app = express();
-app.use(json());
+app.options("*", cors());
 app.use(cors());
+app.use(json());
 
 declare global {
     namespace Express {
@@ -27,8 +28,8 @@ mongoose
     .connect(process.env.MONGO_URL as string)
     .then(() => {
         console.log("Connected to DB.");
-        app.listen(process.env.PORT, () => {
-            console.log(`Server started at PORT ${process.env.PORT}`);
+        app.listen(port, () => {
+            console.log(`Server started at PORT ${port}`);
         });
     })
     .catch((error) => {

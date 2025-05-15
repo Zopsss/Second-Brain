@@ -1,11 +1,9 @@
 import { Router } from "express";
 import { MongoServerError } from "mongodb";
-import jwt, { JwtPayload } from "jsonwebtoken";
+import jwt from "jsonwebtoken";
 import bcrypt from "bcrypt";
 import { userModel } from "../db";
-import { CustomJwtPayload } from "../utils/CustomJwtPayload";
 import z from "zod";
-import { userAuthMiddleware } from "../middlewares";
 
 export const authRouter = Router();
 
@@ -84,6 +82,7 @@ authRouter.post("/signup", async (req, res) => {
             process.env.JWT_SECRET as string
         );
 
+        console.log("account created...");
         res.status(200).json({ token });
     } catch (error) {
         console.log(error);

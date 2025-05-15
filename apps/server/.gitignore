@@ -5,3 +5,4 @@
 /tsconfig.tsbuildinfo
 .vscode/
 pnpm-lock.yaml
+.vercel
