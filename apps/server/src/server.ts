@@ -25,6 +25,14 @@ declare global {
     }
 }
 
+app.use((req, res, next) => {
+    if (req.method === "OPTIONS") {
+        res.sendStatus(200);
+    } else {
+        next();
+    }
+});
+
 app.use(`${process.env.BACKEND_URL}/auth`, authRouter);
 app.use(`${process.env.BACKEND_URL}/content`, contentRouter);
 app.use(`${process.env.BACKEND_URL}/brain`, linkRouter);
