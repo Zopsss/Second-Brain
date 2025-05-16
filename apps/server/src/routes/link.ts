@@ -13,7 +13,7 @@ linkRouter.post("/", userAuthMiddleware, async (req, res) => {
 
     try {
         const hash = uuidv4();
-        const link = ENV_VARS.FRONTEND_URL + hash;
+        const link = ENV_VARS.FRONTEND_URL + "/share/" + hash;
         const brainLink = await brainLinkModel.create({
             link,
             share: true,
@@ -77,7 +77,7 @@ linkRouter.put("/regenerate-link", userAuthMiddleware, async (req, res) => {
 
     try {
         const hash = uuidv4();
-        const brainLink = ENV_VARS.FRONTEND_URL + hash;
+        const brainLink = ENV_VARS.FRONTEND_URL + "/share/" + hash;
         const newBrainLink = await brainLinkModel.findOneAndUpdate(
             { userId },
             { link: brainLink },
@@ -128,7 +128,7 @@ linkRouter.get("/:shareLink", async (req, res) => {
 
     try {
         const brainLink = await brainLinkModel.findOne({
-            link: ENV_VARS.FRONTEND_URL + shareLink,
+            link: ENV_VARS.FRONTEND_URL + "/share/" + shareLink,
         });
 
         if (brainLink) {
