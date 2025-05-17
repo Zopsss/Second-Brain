@@ -1,4 +1,4 @@
-import { Router } from "express";
+import { Request, Response, Router } from "express";
 import { MongoServerError } from "mongodb";
 import jwt from "jsonwebtoken";
 import bcrypt from "bcrypt";
@@ -49,7 +49,7 @@ const SignUpSchema = z
         path: ["confirmPassword"],
     });
 
-authRouter.post("/signup", async (req, res) => {
+authRouter.post("/signup", async (req: Request, res: Response) => {
     const username = req.body.username;
     const password = req.body.password;
     const confirmPassword = req.body.confirmPassword;
@@ -98,7 +98,7 @@ authRouter.post("/signup", async (req, res) => {
     }
 });
 
-authRouter.post("/signin", async (req, res) => {
+authRouter.post("/signin", async (req: Request, res: Response) => {
     const username = req.body.username;
     const password = req.body.password;
 

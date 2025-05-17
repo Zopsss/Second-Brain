@@ -1,4 +1,4 @@
-import express, { json } from "express";
+import express, { json, NextFunction, Request, Response } from "express";
 import mongoose from "mongoose";
 import cors from "cors";
 import "dotenv/config";
@@ -25,7 +25,7 @@ declare global {
     }
 }
 
-app.use((req, res, next) => {
+app.use((req: Request, res: Response, next: NextFunction) => {
     if (req.method === "OPTIONS") {
         res.sendStatus(200);
     } else {
