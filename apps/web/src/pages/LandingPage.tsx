@@ -15,7 +15,7 @@ const LandingPage = ({ isAuth }: { isAuth: boolean }) => {
 
     return (
         <>
-            <main className="h-screen flex justify-center items-center">
+            <main className="h-screen flex justify-center items-center px-3 md:px-0">
                 <div>
                     <h1 className="text-4xl font-bold text-center mb-5">
                         Your Digital Memory, <br /> Organized
@@ -32,7 +32,7 @@ const LandingPage = ({ isAuth }: { isAuth: boolean }) => {
                     </div>
                 </div>
             </main>
-            <div className="h-screen flex justify-center items-center">
+            <div className="h-screen flex justify-center items-center px-3 md:px-0">
                 <div>
                     <h1 className="text-purple-600 font-semibold text-center">
                         Store Smarter
@@ -41,7 +41,7 @@ const LandingPage = ({ isAuth }: { isAuth: boolean }) => {
                         Everything you need to organize your <br />
                         digital life
                     </h1>
-                    <div className="grid grid-cols-2 gap-x-20 gap-y-20 max-w-[60%] place-items-center mx-auto mt-20">
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-x-20 gap-y-20 max-w-[60%] place-items-center mx-auto mt-20">
                         <div className="flex gap-5">
                             <div className="bg-purple-500 px-3 py-2 w-fit h-fit text-white rounded-lg">
                                 <Link />

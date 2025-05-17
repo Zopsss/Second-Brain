@@ -37,7 +37,7 @@ const Sidebar = ({
             <div
                 ref={sidebarRef}
                 className={`h-full min-w-fit fixed lg:sticky drop-shadow-xl lg:drop-shadow-none
-                    top-[126px] lg:top-16 bg-white border-r px-3 pt-5 z-10
+                    top-[129px] md:top-[172px] lg:top-16 bg-white border-r px-3 pt-5 z-[11]
                     lg:motion-opacity-in-100
                     ${
                         sidebarOpen

@@ -61,12 +61,12 @@ const SignUp = ({ setIsAuth }: { setIsAuth: (arg0: boolean) => void }) => {
     };
 
     return (
-        <div className="h-screen flex flex-col justify-center items-center bg-slate-100">
+        <div className="h-screen flex flex-col justify-center items-center bg-slate-100 px-3 md:px-0">
             <div>
-                <h1 className="text-3xl font-bold mb-2">
+                <h1 className="text-3xl font-bold mb-2 text-wrap text-center">
                     Create a new account
                 </h1>
-                <p className="font-light text-center tracking-wide">
+                <p className="font-light text-center tracking-wide text-wrap">
                     Already have an account?{" "}
                     <Link to="/login" className="text-purple-500 font-semibold">
                         Login
@@ -75,9 +75,9 @@ const SignUp = ({ setIsAuth }: { setIsAuth: (arg0: boolean) => void }) => {
             </div>
             <form
                 onSubmit={handleSubmit(onSubmit)}
-                className="mt-10 flex gap-4 flex-col bg-white min-w-3/12 items-center justify-center px-10 py-7 rounded-md"
+                className="mt-10 flex gap-4 flex-col w-fit bg-white items-center justify-center px-10 py-7 rounded-md"
             >
-                <div className="w-full">
+                <div className="sm:w-96">
                     <label className="text-sm font-semibold">Username</label>
                     <Input
                         placeholder="username"
@@ -91,7 +91,7 @@ const SignUp = ({ setIsAuth }: { setIsAuth: (arg0: boolean) => void }) => {
                         </span>
                     )}
                 </div>
-                <div className="w-full">
+                <div className="sm:w-96">
                     <label className="text-sm font-semibold">Password</label>
                     <Input
                         type="password"
@@ -105,7 +105,7 @@ const SignUp = ({ setIsAuth }: { setIsAuth: (arg0: boolean) => void }) => {
                         </span>
                     )}
                 </div>
-                <div className="w-full">
+                <div className="sm:w-96">
                     <label className="text-sm font-semibold">
                         Confirm Password
                     </label>
@@ -124,7 +124,7 @@ const SignUp = ({ setIsAuth }: { setIsAuth: (arg0: boolean) => void }) => {
                 <Button
                     title="Sign Up"
                     variant="Primary"
-                    className="w-96"
+                    className="w-full"
                     type="submit"
                 />
                 {errors.root && (

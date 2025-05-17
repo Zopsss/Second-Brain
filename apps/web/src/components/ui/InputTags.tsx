@@ -54,7 +54,7 @@ const InputTags = forwardRef<HTMLInputElement, InputProps>(
                     )}
                     <input
                         ref={inputRef}
-                        className={`focus:outline-none shrink pr-3 flex-1 ${className}`}
+                        className={`focus:outline-none shrink pr-3 w-full ${className}`}
                         onKeyDown={(e) => {
                             const inputElement = e.target as HTMLInputElement;
 

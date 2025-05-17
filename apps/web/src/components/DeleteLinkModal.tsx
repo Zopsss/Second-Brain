@@ -67,7 +67,7 @@ const DeleteLinkModal = ({
         <div className="fixed inset-0 bg-slate-800 bg-opacity-50 flex items-center justify-center p-4 z-20">
             <div
                 ref={modalRef}
-                className="bg-white rounded-lg shadow-lg modal-animation"
+                className="bg-white max-w-md w-full rounded-lg shadow-lg p-4 modal-animation"
             >
                 <div className="flex flex-col items-center justify-center gap-5 mb-5">
                     <div className="flex w-full justify-end mr-8 mt-4">
@@ -79,21 +79,21 @@ const DeleteLinkModal = ({
                         </button>
                     </div>
                     <div className="px-10 py-4">
-                        <h1 className="font-bold text-center mb-4">
+                        <h1 className="font-bold text-center mb-4 text-wrap">
                             Are you sure you want to delete this link?
                         </h1>
                         <hr />
-                        <div className="mt-4">
+                        <div className="mt-4 text-wrap w-fit">
                             <div className="flex gap-2 items-center mb-3">
                                 <h1 className="font-bold">Title: </h1>
-                                <h1 className="font-bold text-sm">
+                                <h1 className="font-bold text-sm text-wrap">
                                     {link.title}
                                 </h1>
                             </div>
                             <div className="flex gap-2 items-center">
                                 <h1 className="font-bold">Link: </h1>
                                 <a
-                                    className="font-bold text-sm text-purple-600"
+                                    className="font-bold text-sm text-purple-600 break-all"
                                     href={link.link}
                                     target="_blank"
                                 >

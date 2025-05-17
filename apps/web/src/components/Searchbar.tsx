@@ -7,8 +7,9 @@ import { useDebounceCallback } from "usehooks-ts";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import axios from "axios";
 import { ENV_VARS } from "../constants/envs";
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import InputTags from "./ui/InputTags";
+import { SearchIcon } from "lucide-react";
 
 const Searchbar = ({
     token,
@@ -23,6 +24,7 @@ const Searchbar = ({
     setBrainLinkModal: React.Dispatch<React.SetStateAction<BrainLinkModalType>>;
     setSidebarOpen: React.Dispatch<React.SetStateAction<boolean>>;
 }) => {
+    const [showSearchBar, setShowSearchbar] = useState(false);
     const queryClient = useQueryClient();
     const { register, watch, setValue } = useForm<{
         title: string;
@@ -45,6 +47,10 @@ const Searchbar = ({
         onSuccess: (data) => {
             queryClient.setQueryData(["userData"], data);
         },
+        onError: () => {
+            // if no data found then show nothing
+            queryClient.setQueryData(["userData"], []);
+        },
     });
 
     const debouncedCallback = useDebounceCallback(() => {
@@ -60,18 +66,61 @@ const Searchbar = ({
     }, [title, tags]);
 
     return (
-        <div className="flex py-3 md:p-3 items-center justify-between gap-3">
-            <span
-                className="block lg:hidden cursor-pointer"
-                onClick={() => setSidebarOpen((x) => !x)}
+        <>
+            <div className="flex py-3 md:p-3 items-center gap-3">
+                <span
+                    className="block lg:hidden cursor-pointer"
+                    onClick={() => setSidebarOpen((x) => !x)}
+                >
+                    {sidebarOpen ? (
+                        <Close className="motion-preset-fade-lg" />
+                    ) : (
+                        <Hamburger className="motion-preset-fade-lg" />
+                    )}
+                </span>
+                <div className="flex items-center justify-end gap-3 w-full">
+                    <div className="hidden md:grid grid-cols-1 flex-1 gap-2 lg:grid-cols-2">
+                        <Input
+                            className="flex-1"
+                            placeholder="Search by title..."
+                            leftIcon={<Search />}
+                            {...register("title")}
+                        />
+                        <InputTags
+                            tags={tags}
+                            setValue={setValue}
+                            className="flex-1"
+                            placeholder="Search by tags..."
+                            leftIcon={<Search />}
+                        />
+                    </div>
+                    <Button
+                        className="block md:hidden"
+                        variant="Outline"
+                        title=""
+                        leftIcon={<SearchIcon />}
+                        onClick={() => setShowSearchbar((state) => !state)}
+                    />
+                    <Button
+                        variant="Outline"
+                        title="Brain Link"
+                        leftIcon={<Share />}
+                        onClick={() =>
+                            setBrainLinkModal((e) => ({ ...e, show: true }))
+                        }
+                    />
+                    <Button
+                        variant="Primary"
+                        title="Add Link"
+                        leftIcon={<Add />}
+                        onClick={() => setAddLinkModal(true)}
+                    />
+                </div>
+            </div>
+            <div
+                className={`${showSearchBar ? "grid" : "hidden"}
+                    md:hidden mb-3 grid-cols-1 flex-1 gap-2 lg:grid-cols-2`}
             >
-                {sidebarOpen ? (
-                    <Close className="motion-preset-fade-lg" />
-                ) : (
-                    <Hamburger className="motion-preset-fade-lg" />
-                )}
-            </span>
-            <div className="grid grid-cols-1 flex-1 gap-2 lg:grid-cols-2">
                 <Input
                     className="flex-1"
                     placeholder="Search by title..."
@@ -86,19 +135,7 @@ const Searchbar = ({
                     leftIcon={<Search />}
                 />
             </div>
-            <Button
-                variant="Outline"
-                title="Brain Link"
-                leftIcon={<Share />}
-                onClick={() => setBrainLinkModal((e) => ({ ...e, show: true }))}
-            />
-            <Button
-                variant="Primary"
-                title="Add Link"
-                leftIcon={<Add />}
-                onClick={() => setAddLinkModal(true)}
-            />
-        </div>
+        </>
     );
 };
 
